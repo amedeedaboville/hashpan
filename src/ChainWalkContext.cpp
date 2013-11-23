@@ -115,7 +115,7 @@ bool CChainWalkContext::LoadCharset(string sName)
 				// Is it the wanted charset?
 				if (sCharsetName == sName)
 				{
-					m_nPlainCharsetLen = sCharsetContent.size();
+					m_nPlainCharsetLen = sCharsetContent.size() + 7; //Add room for the BIN and the check
 					memcpy(m_PlainCharset, sCharsetContent.c_str(), m_nPlainCharsetLen);
 					m_sPlainCharsetName = sCharsetName;
 					m_sPlainCharsetContent = sCharsetContent;
