@@ -34,7 +34,7 @@ void QuickSort(RainbowChain* pChain, int nRainbowChainCount)
 
 int QuickSortPartition(RainbowChain* pChain, int nLow, int nHigh)
 {
-	int nRandomIndex = nLow + ((unsigned int)rand() * (RAND_MAX + 1) + (unsigned int)rand()) % (nHigh - nLow + 1);
+	int nRandomIndex = nLow + ((unsigned int)rand()) % (nHigh - nLow + 1);
 	RainbowChain TempChain;
 	TempChain = pChain[nLow];
 	pChain[nLow] = pChain[nRandomIndex];
@@ -289,7 +289,7 @@ int main(int argc, char* argv[])
 				}
 
 				// Sort file
-				printf("sorting rainbow table...\n");
+				printf("sorting rainbow table with %d chains...\n", nRainbowChainCount);
 				QuickSort(pChain, 0, nRainbowChainCount - 1);
 
 				// Write file
