@@ -1,0 +1,21 @@
+
+all: rtgen rtdump rtsort rcrack
+
+rtgen:
+	g++ Public.cpp ChainWalkContext.cpp HashAlgorithm.cpp HashRoutine.cpp RainbowTableGenerate.cpp -DBIG_ENDIAN -lssl -lcrypto -fast -mcpu=7450 -mtune=7450 -mdynamic-no-pic -fasm-blocks -o rtgen
+
+rtdump:
+	g++ Public.cpp ChainWalkContext.cpp HashAlgorithm.cpp HashRoutine.cpp RainbowTableDump.cpp -DBIG_ENDIAN -lssl -lcrypto -fast -mcpu=7450 -mtune=7450 -fasm-blocks -o rtdump
+
+rtsort:
+	g++ Public.cpp RainbowTableSort.cpp -fast -mcpu=7450 -mtune=7450 -o rtsort
+
+rcrack:
+	g++ Public.cpp ChainWalkContext.cpp HashAlgorithm.cpp HashRoutine.cpp HashSet.cpp MemoryPool.cpp ChainWalkSet.cpp CrackEngine.cpp RainbowCrack.cpp -DBIG_ENDIAN -lssl -lcrypto -fast -mcpu=7450 -mtune=7450 -fasm-blocks -o rcrack
+
+clean: 
+	rm -f rtgen 
+	rm -f rtdump 
+	rm -f rtsort 
+	rm -f rcrack 
+

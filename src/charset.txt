@@ -1,0 +1,13 @@
+# rainbowcrack.com charset file
+# visit http://www.rainbowcrack.com/rainbowtables.php to view the list of completed and needed tables
+
+alpha = [ABCDEFGHIJKLMNOPQRSTUVWXYZ]
+alpha-numeric = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]
+alpha-numeric-symbol14 = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+=]
+alpha-numeric-symbol14-space = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+= ]
+alpha-numeric-symbol32-space = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+=~`[]{}|\:;"'<>,.?/ ]
+loweralpha = [abcdefghijklmnopqrstuvwxyz]
+loweralpha-numeric = [abcdefghijklmnopqrstuvwxyz0123456789]
+loweralpha-numeric-symbol14 = [abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_+=]
+loweralpha-numeric-symbol32-space = [abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_+=~`[]{}|\:;"'<>,.?/ ]
+numeric = [0123456789]
