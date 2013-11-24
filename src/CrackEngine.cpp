@@ -36,9 +36,10 @@ int CCrackEngine::BinarySearch(RainbowChain* pChain, int nRainbowChainCount, uin
 {
 	int nLow = 0;
 	int nHigh = nRainbowChainCount - 1;
+  int nMid = (nLow + nHigh) / 2;
 	while (nLow <= nHigh)
 	{
-		int nMid = (nLow + nHigh) / 2;
+		nMid = (nLow + nHigh) / 2;
 		if (nIndex == pChain[nMid].nIndexE)
 			return nMid;
 		else if (nIndex < pChain[nMid].nIndexE)
@@ -129,7 +130,7 @@ void CCrackEngine::SearchTableChunk(RainbowChain* pChain, int nRainbowChainLen, 
 													nRainbowChainLen,
 													fNewlyGenerated);
 		//printf("debug: using %s walk for %s\n", fNewlyGenerated ? "newly generated" : "existing",
-		//										vHash[nHashIndex].c_str());
+	  //									vHash[nHashIndex].c_str());
 
 		// Walk
 		int nPos;

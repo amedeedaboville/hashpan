@@ -22,9 +22,10 @@ private:
 	static int m_nHashLen;										// Configuration
 
 	static unsigned char m_PlainCharset[256];					// Configuration
-	static int m_nPlainCharsetLen;								// Configuration
-	static int m_nPlainLenMin;									// Configuration
-	static int m_nPlainLenMax;									// Configuration
+	static unsigned char m_BIN[6];
+	static const int m_nPlainCharsetLen = 10;								// Configuration
+	static const int m_nPlainLenMin = 16;									// Configuration
+	static const int m_nPlainLenMax = 16;									// Configuration
 	static string m_sPlainCharsetName;
 	static string m_sPlainCharsetContent;
 	static uint64 m_nPlainSpaceUpToX[MAX_PLAIN_LEN + 1];		// Performance consideration
@@ -40,16 +41,17 @@ private:
 	unsigned char m_Hash[MAX_HASH_LEN];
 
 private:
-	static bool LoadCharset(string sName);
+	static bool LoadCharset();
+  void Luhn();
 
 public:
 	static bool SetHashRoutine(string sHashRoutineName);												// Configuration
-	static bool SetPlainCharset(string sCharsetName, int nPlainLenMin, int nPlainLenMax);				// Configuration
+	static bool SetBIN(string sBIN);												// Configuration
+	static bool SetPlainCharset();				// Configuration
 	static bool SetRainbowTableIndex(int nRainbowTableIndex);											// Configuration
 	static bool SetupWithPathName(string sPathName, int& nRainbowChainLen, int& nRainbowChainCount);	// Wrapper
 	static string GetHashRoutineName();
 	static int GetHashLen();
-	static string GetPlainCharsetName();
 	static string GetPlainCharsetContent();
 	static int GetPlainLenMin();
 	static int GetPlainLenMax();
@@ -71,6 +73,7 @@ public:
 	string GetPlainBinary();
 	string GetHash();
 	bool CheckHash(unsigned char* pHash);	// The length should be m_nHashLen
+
 };
 
 #endif

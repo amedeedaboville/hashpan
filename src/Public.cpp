@@ -195,7 +195,6 @@ void ParseHash(string sHash, unsigned char* pHash, int& nHashLen)
 
 void Logo()
 {
-	printf("RainbowCrack 1.2 - Making a Faster Cryptanalytic Time-Memory Trade-Off\n");
-	printf("by Zhu Shuanglei <shuanglei@hotmail.com>\n");
-	printf("http://www.antsight.com/zsl/rainbowcrack/\n\n");
+	printf("PanRainbowCrack: Cracking PANs fast");
+	printf("Based on RainbowCrack 1.2 by Zhu Shuanglei <shuanglei@hotmail.com>\n");
 }

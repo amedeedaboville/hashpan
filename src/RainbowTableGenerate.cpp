@@ -21,23 +21,21 @@ void Usage()
 {
 	Logo();
 
-	printf("usage: rtgen hash_algorithm \\\n");
-	printf("             plain_charset plain_len_min plain_len_max \\\n");
+	printf("usage: rpangen hash_algorithm \\\n");
+	printf("             bin \\\n");
 	printf("             rainbow_table_index \\\n");
 	printf("             rainbow_chain_length rainbow_chain_count \\\n");
 	printf("             file_title_suffix\n");
-	printf("       rtgen hash_algorithm \\\n");
-	printf("             plain_charset plain_len_min plain_len_max \\\n");
+	printf("       rpangen hash_algorithm \\\n");
+	printf("             bin \\\n");
 	printf("             rainbow_table_index \\\n");
 	printf("             -bench\n");
 	printf("\n");
 
 	CHashRoutine hr;
 	printf("hash_algorithm:       available: %s\n", hr.GetAllHashRoutineName().c_str());
-	printf("plain_charset:        use any charset name in charset.txt here\n");
+	printf("bin:                  the 6 digit Bank Identification Number\n");
 	printf("                      use \"byte\" to specify all 256 characters as the charset of the plaintext\n");
-	printf("plain_len_min:        min length of the plaintext\n");
-	printf("plain_len_max:        max length of the plaintext\n");
 	printf("rainbow_table_index:  index of the rainbow table\n");
 	printf("rainbow_chain_length: length of the rainbow chain\n");
 	printf("rainbow_chain_count:  count of the rainbow chain to generate\n");
@@ -46,13 +44,12 @@ void Usage()
 	printf("-bench:               do some benchmark\n");
 
 	printf("\n");
-	printf("example: rtgen lm alpha 1 7 0 100 16 test\n");
-	printf("         rtgen md5 byte 4 4 0 100 16 test\n");
-	printf("         rtgen sha1 numeric 1 10 0 100 16 test\n");
-	printf("         rtgen lm alpha 1 7 0 -bench\n");
+	printf("example: rpangen sha1 530957 1 7 0 100 16 test\n");
+	printf("         rpangen md5  123456 4 4 0 100 16 test\n");
+	printf("         rpangen sha2 430513 1 -bench\n");
 }
 
-void Bench(string sHashRoutineName, string sCharsetName, int nPlainLenMin, int nPlainLenMax, int nRainbowTableIndex)
+void Bench(string sHashRoutineName, string sBINNumber, int nRainbowTableIndex)
 {
 	// Setup CChainWalkContext
 	if (!CChainWalkContext::SetHashRoutine(sHashRoutineName))
@@ -60,7 +57,9 @@ void Bench(string sHashRoutineName, string sCharsetName, int nPlainLenMin, int n
 		printf("hash routine %s not supported\n", sHashRoutineName.c_str());
 		return;
 	}
-	if (!CChainWalkContext::SetPlainCharset(sCharsetName, nPlainLenMin, nPlainLenMax))
+	if (!CChainWalkContext::SetPlainCharset())
+		return;
+	if (!CChainWalkContext::SetBIN(sBINNumber))
 		return;
 	if (!CChainWalkContext::SetRainbowTableIndex(nRainbowTableIndex))
 	{
@@ -108,30 +107,28 @@ void Bench(string sHashRoutineName, string sCharsetName, int nPlainLenMin, int n
 
 int main(int argc, char* argv[])
 {
-	if (argc == 7)
+	if (argc == 5)
 	{
-		if (strcmp(argv[6], "-bench") == 0)
+		if (strcmp(argv[5], "-bench") == 0)
 		{
-			Bench(argv[1], argv[2], stoi(argv[3]), stoi(argv[4]), stoi(argv[5]));
+			Bench(argv[1], argv[2], stoi(argv[3]));
 			return 0;
 		}
 	}
 
-	if (argc != 9)
+	if (argc != 7)
 	{
 		Usage();
 		return 0;
 	}
 
 	string sHashRoutineName  = argv[1];
-	string sCharsetName      = argv[2];
-	int nPlainLenMin         = stoi(argv[3]);
-	int nPlainLenMax         = stoi(argv[4]);
-	int nRainbowTableIndex   = stoi(argv[5]);
+	string sBINNumber        = argv[2];
+	int nRainbowTableIndex   = stoi(argv[3]);
 
-	int nRainbowChainLen     = stoi(argv[6]);
-	int nRainbowChainCount   = stoi(argv[7]);
-	string sFileTitleSuffix  = argv[8];
+	int nRainbowChainLen     = stoi(argv[4]);
+	int nRainbowChainCount   = stoi(argv[5]);
+	string sFileTitleSuffix  = argv[6];
 
 	// nRainbowChainCount check
 	if (nRainbowChainCount >= 134217728)
@@ -147,7 +144,9 @@ int main(int argc, char* argv[])
 		printf("hash routine %s not supported\n", sHashRoutineName.c_str());
 		return 0;
 	}
-	if (!CChainWalkContext::SetPlainCharset(sCharsetName, nPlainLenMin, nPlainLenMax))
+	if (!CChainWalkContext::SetBIN(sBINNumber))
+		return false;
+	if (!CChainWalkContext::SetPlainCharset())
 		return 0;
 	if (!CChainWalkContext::SetRainbowTableIndex(nRainbowTableIndex))
 	{
@@ -165,10 +164,7 @@ int main(int argc, char* argv[])
 
 	// FileName
 	char szFileName[256];
-	sprintf(szFileName, "%s_%s#%d-%d_%d_%dx%d_%s.rt", sHashRoutineName.c_str(),
-													  sCharsetName.c_str(),
-													  nPlainLenMin,
-													  nPlainLenMax,
+	sprintf(szFileName, "%s_%d_%dx%d_%s.rt", sHashRoutineName.c_str(),
 													  nRainbowTableIndex,
 													  nRainbowChainLen,
 													  nRainbowChainCount,

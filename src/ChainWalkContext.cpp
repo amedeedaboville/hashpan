@@ -21,12 +21,9 @@
 string CChainWalkContext::m_sHashRoutineName;
 HASHROUTINE CChainWalkContext::m_pHashRoutine;
 int CChainWalkContext::m_nHashLen;
+unsigned char CChainWalkContext::m_BIN[6];
 
 unsigned char CChainWalkContext::m_PlainCharset[256];
-int CChainWalkContext::m_nPlainCharsetLen;
-int CChainWalkContext::m_nPlainLenMin;
-int CChainWalkContext::m_nPlainLenMax;
-string CChainWalkContext::m_sPlainCharsetName;
 string CChainWalkContext::m_sPlainCharsetContent;
 uint64 CChainWalkContext::m_nPlainSpaceUpToX[MAX_PLAIN_LEN + 1];
 uint64 CChainWalkContext::m_nPlainSpaceTotal;
@@ -36,103 +33,28 @@ uint64 CChainWalkContext::m_nReduceOffset;
 
 //////////////////////////////////////////////////////////////////////
 
-CChainWalkContext::CChainWalkContext()
+CChainWalkContext::CChainWalkContext() { }
+CChainWalkContext::~CChainWalkContext() { }
+
+bool CChainWalkContext::LoadCharset()
 {
-}
-
-CChainWalkContext::~CChainWalkContext()
-{
-}
-
-bool CChainWalkContext::LoadCharset(string sName)
-{
-	if (sName == "byte")
-	{
-		int i;
-		for (i = 0x00; i <= 0xff; i++)
-			m_PlainCharset[i] = i;
-		m_nPlainCharsetLen = 256;
-		m_sPlainCharsetName = sName;
-		m_sPlainCharsetContent = "0x00, 0x01, ... 0xff";
-		return true;
-	}
-
-	vector<string> vLine;
-	if (ReadLinesFromFile("charset.txt", vLine))
-	{
-		int i;
-		for (i = 0; i < vLine.size(); i++)
-		{
-			// Filter comment
-			if (vLine[i][0] == '#')
-				continue;
-
-			vector<string> vPart;
-			if (SeperateString(vLine[i], "=", vPart))
-			{
-				// sCharsetName
-				string sCharsetName = TrimString(vPart[0]);
-				if (sCharsetName == "")
-					continue;
-
-				// sCharsetName charset check
-				bool fCharsetNameCheckPass = true;
-				int j;
-				for (j = 0; j < sCharsetName.size(); j++)
-				{
-					if (   !isalpha(sCharsetName[j])
-						&& !isdigit(sCharsetName[j])
-						&& (sCharsetName[j] != '-'))
-					{
-						fCharsetNameCheckPass = false;
-						break;
-					}
-				}
-				if (!fCharsetNameCheckPass)
-				{
-					printf("invalid charset name %s in charset configuration file\n", sCharsetName.c_str());
-					continue;
-				}
-
-				// sCharsetContent
-				string sCharsetContent = TrimString(vPart[1]);
-				if (sCharsetContent == "" || sCharsetContent == "[]")
-					continue;
-				if (sCharsetContent[0] != '[' || sCharsetContent[sCharsetContent.size() - 1] != ']')
-				{
-					printf("invalid charset content %s in charset configuration file\n", sCharsetContent.c_str());
-					continue;
-				}
-				sCharsetContent = sCharsetContent.substr(1, sCharsetContent.size() - 2);
-				if (sCharsetContent.size() > 256)
-				{
-					printf("charset content %s too long\n", sCharsetContent.c_str());
-					continue;
-				}
-
-				//printf("%s = [%s]\n", sCharsetName.c_str(), sCharsetContent.c_str());
-
-				// Is it the wanted charset?
-				if (sCharsetName == sName)
-				{
-					m_nPlainCharsetLen = sCharsetContent.size() + 7; //Add room for the BIN and the check
-					memcpy(m_PlainCharset, sCharsetContent.c_str(), m_nPlainCharsetLen);
-					m_sPlainCharsetName = sCharsetName;
-					m_sPlainCharsetContent = sCharsetContent;
-					return true;
-				}
-			}
-		}
-		printf("charset %s not found in charset.txt\n", sName.c_str());
-	}
-	else
-		printf("can't open charset configuration file\n");
-
-	return false;
+  m_sPlainCharsetContent = "0123456789";
+  memcpy(m_PlainCharset, m_sPlainCharsetContent.c_str(), m_nPlainCharsetLen);
+  return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
+bool CChainWalkContext::SetBIN(string sBIN)
+{
+	if (!sBIN.empty())
+	{
+    memcpy(m_BIN, sBIN.c_str(), sBIN.size());
+		return true;
+	}
+	else
+		return false;
+}
 bool CChainWalkContext::SetHashRoutine(string sHashRoutineName)
 {
 	CHashRoutine hr;
@@ -146,20 +68,11 @@ bool CChainWalkContext::SetHashRoutine(string sHashRoutineName)
 		return false;
 }
 
-bool CChainWalkContext::SetPlainCharset(string sCharsetName, int nPlainLenMin, int nPlainLenMax)
+bool CChainWalkContext::SetPlainCharset()
 {
 	// m_PlainCharset, m_nPlainCharsetLen, m_sPlainCharsetName, m_sPlainCharsetContent
-	if (!LoadCharset(sCharsetName))
+	if (!LoadCharset())
 		return false;
-
-	// m_nPlainLenMin, m_nPlainLenMax
-	if (nPlainLenMin < 1 || nPlainLenMax > MAX_PLAIN_LEN || nPlainLenMin > nPlainLenMax)
-	{
-		printf("invalid plaintext length range: %d - %d\n", nPlainLenMin, nPlainLenMax);
-		return false;
-	}
-	m_nPlainLenMin = nPlainLenMin;
-	m_nPlainLenMax = nPlainLenMax;
 
 	// m_nPlainSpaceUpToX
 	m_nPlainSpaceUpToX[0] = 0;
@@ -215,43 +128,20 @@ bool CChainWalkContext::SetupWithPathName(string sPathName, int& nRainbowChainLe
 
 	// Parse
 	vector<string> vPart;
-	if (!SeperateString(sPathName, "___x_", vPart))
+	if (!SeperateString(sPathName, "__x_.", vPart))
 	{
 		printf("filename %s not identified\n", sPathName.c_str());
 		return false;
 	}
 
 	string sHashRoutineName   = vPart[0];
-	int nRainbowTableIndex    = stoi(vPart[2].c_str());
+	int nRainbowTableIndex    = stoi(vPart[1].c_str());
 
-	nRainbowChainLen          = stoi(vPart[3].c_str());
-	nRainbowChainCount        = stoi(vPart[4].c_str());
+	nRainbowChainLen          = stoi(vPart[2].c_str());
+	nRainbowChainCount        = stoi(vPart[3].c_str());
+	string sBINNumber = vPart[4];
 
 	// Parse charset definition
-	string sCharsetDefinition = vPart[1];
-	string sCharsetName;
-	int nPlainLenMin, nPlainLenMax;
-	if (sCharsetDefinition.find('#') == -1)		// For backward compatibility, "#1-7" is implied
-	{
-		sCharsetName = sCharsetDefinition;
-		nPlainLenMin = 1;
-		nPlainLenMax = 7;
-	}
-	else
-	{
-		vector<string> vCharsetDefinitionPart;
-		if (!SeperateString(sCharsetDefinition, "#-", vCharsetDefinitionPart))
-		{
-			printf("filename %s not identified\n", sPathName.c_str());
-			return false;	
-		}
-		else
-		{
-			sCharsetName = vCharsetDefinitionPart[0];
-			nPlainLenMin = stoi(vCharsetDefinitionPart[1].c_str());
-			nPlainLenMax = stoi(vCharsetDefinitionPart[2].c_str());
-		}
-	}
 
 	// Setup
 	if (!SetHashRoutine(sHashRoutineName))
@@ -259,7 +149,10 @@ bool CChainWalkContext::SetupWithPathName(string sPathName, int& nRainbowChainLe
 		printf("hash routine %s not supported\n", sHashRoutineName.c_str());
 		return false;
 	}
-	if (!SetPlainCharset(sCharsetName, nPlainLenMin, nPlainLenMax))
+
+	if (!SetBIN(sBINNumber))
+		return false;
+	if (!SetPlainCharset())
 		return false;
 	if (!SetRainbowTableIndex(nRainbowTableIndex))
 	{
@@ -278,11 +171,6 @@ string CChainWalkContext::GetHashRoutineName()
 int CChainWalkContext::GetHashLen()
 {
 	return m_nHashLen;
-}
-
-string CChainWalkContext::GetPlainCharsetName()
-{
-	return m_sPlainCharsetName;
 }
 
 string CChainWalkContext::GetPlainCharsetContent()
@@ -332,7 +220,6 @@ void CChainWalkContext::Dump()
 	printf("\n");
 
 	printf("plain length range: %d - %d\n", m_nPlainLenMin, m_nPlainLenMax);
-	printf("plain charset name: %s\n", m_sPlainCharsetName.c_str());
 	//printf("plain charset content: %s\n", m_sPlainCharsetContent.c_str());
 	//for (i = 0; i <= m_nPlainLenMax; i++)
 	//	printf("plain space up to %d: %s\n", i, uint64tostr(m_nPlainSpaceUpToX[i]).c_str());
@@ -358,45 +245,54 @@ void CChainWalkContext::SetHash(unsigned char* pHash)
 {
 	memcpy(m_Hash, pHash, m_nHashLen);
 }
-
+void CChainWalkContext::Luhn() {
+  int check = 0;
+  /* Luhn Check works this way:
+   *       7 9 9 2 7 3 9 8 7 1 
+   * times 1 2 1 2 1 2 1 2 1 2
+   * equals7 9 9 4 7 6 9 7 7 2
+   * sum = 67 mod 10 = 7
+   */
+  const int d[] = {0,2,4,6,8,1,3,5,7,9}; // mapping for rule 3
+  int val = m_Plain[0] - '0';
+  m_Plain[15] = '0';
+  for (int i = 0; i < 16; i++) {
+  val = m_Plain[i] - '0';
+    if (i % 2 == 0)
+      check += d[val];
+    else
+      check += val;
+  }
+  m_Plain[15] = '0' + ((9 * check) % 10); //Convert our int to ASCII char, store it properly
+  /*
+  for(int i = 0; i < 16; i++) {
+    printf("%c", m_Plain[i]);
+  }
+  printf("\n");
+  */
+}
 void CChainWalkContext::IndexToPlain()
 {
-	int i;
-	for (i = m_nPlainLenMax - 1; i >= m_nPlainLenMin - 1; i--)
-	{
-		if (m_nIndex >= m_nPlainSpaceUpToX[i])
-		{
-			m_nPlainLen = i + 1;
-			break;
-		}
-	}
+  int i;
+	uint64 nIndexOfX = m_nIndex - m_nPlainSpaceUpToX[15];
 
-	uint64 nIndexOfX = m_nIndex - m_nPlainSpaceUpToX[m_nPlainLen - 1];
+  //Copies the BIN into the first 6 digits
+  for(int k = 0 ; k < 6; k++) {
+    m_Plain[k] = m_BIN[k];
+  }
 
-
-/*	// Slow version
-	for (i = m_nPlainLen - 1; i >= 0; i--)
+  //At the bottom, after everything else is generated, I added the Luhn check.
+	// Fast copy
+	for (i = 14; i >= 6; i--) // Start at -2, go until 6
 	{
-		m_Plain[i] = m_PlainCharset[nIndexOfX % m_nPlainCharsetLen];
-		nIndexOfX /= m_nPlainCharsetLen;
-	}
-*/
-	// Fast version
-	for (i = m_nPlainLen - 1; i >= 0; i--)
-	{
-#ifdef _WIN32
-		if (nIndexOfX < 0x100000000I64)
-			break;
-#else
 		if (nIndexOfX < 0x100000000llu)
 			break;
-#endif
 
 		m_Plain[i] = m_PlainCharset[nIndexOfX % m_nPlainCharsetLen];
 		nIndexOfX /= m_nPlainCharsetLen;
 	}
 	unsigned int nIndexOfX32 = (unsigned int)nIndexOfX;
-	for (; i >= 0; i--)
+	for (; i >= 6; i--)
 	{
 	//	m_Plain[i] = m_PlainCharset[nIndexOfX32 % m_nPlainCharsetLen];
 	//	nIndexOfX32 /= m_nPlainCharsetLen;
@@ -440,11 +336,12 @@ void CChainWalkContext::IndexToPlain()
 
 		m_Plain[i] = m_PlainCharset[nTemp];
 	}
+  Luhn();
 }
 
 void CChainWalkContext::PlainToHash()
 {
-	m_pHashRoutine(m_Plain, m_nPlainLen, m_Hash);
+	m_pHashRoutine(m_Plain, 16, m_Hash);
 }
 
 void CChainWalkContext::HashToIndex(int nPos)
@@ -461,7 +358,7 @@ string CChainWalkContext::GetPlain()
 {
 	string sRet;
 	int i;
-	for (i = 0; i < m_nPlainLen; i++)
+	for (i = 0; i < 16; i++)
 	{
 		char c = m_Plain[i];
 		if (c >= 32 && c <= 126)
@@ -475,7 +372,7 @@ string CChainWalkContext::GetPlain()
 
 string CChainWalkContext::GetBinary()
 {
-	return HexToStr(m_Plain, m_nPlainLen);
+	return HexToStr(m_Plain, 16);
 }
 
 string CChainWalkContext::GetPlainBinary()
@@ -483,13 +380,13 @@ string CChainWalkContext::GetPlainBinary()
 	string sRet;
 	sRet += GetPlain();
 	int i;
-	for (i = 0; i < m_nPlainLenMax - m_nPlainLen; i++)
+	for (i = 0; i < m_nPlainLenMax - 16; i++)
 		sRet += ' ';
 
 	sRet += "|";
 
 	sRet += GetBinary();
-	for (i = 0; i < m_nPlainLenMax - m_nPlainLen; i++)
+	for (i = 0; i < m_nPlainLenMax - 16; i++)
 		sRet += "  ";
 
 	return sRet;

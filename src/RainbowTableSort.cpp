@@ -5,25 +5,19 @@
 */
 
 #include "Public.h"
+#include <time.h>
+#include <algorithm>
 
 #define ASSUMED_MIN_MEMORY 32 * 1024 * 1024
 
 /////////////////////////////////////////////////////////////////////////////
 
-/*
-int QuickSortCompare(const void* pElem1, const void* pElem2)
+
+bool QuickSortCompare(const RainbowChain pElem1, const RainbowChain pElem2)
 {
-	uint64 n1 = ((RainbowChain*)pElem1)->nIndexE;
-	uint64 n2 = ((RainbowChain*)pElem2)->nIndexE;
-
-	if (n1 < n2)
-		return -1;
-	else if (n1 == n2)
-		return 0;
-	else
-		return 1;
+  return pElem1.nIndexE < pElem2.nIndexE;
 }
-
+/*
 void QuickSort(RainbowChain* pChain, int nRainbowChainCount)
 {
 	qsort(pChain, nRainbowChainCount, 16, QuickSortCompare);	// so slow!
@@ -34,11 +28,17 @@ void QuickSort(RainbowChain* pChain, int nRainbowChainCount)
 
 int QuickSortPartition(RainbowChain* pChain, int nLow, int nHigh)
 {
-	int nRandomIndex = nLow + ((unsigned int)rand()) % (nHigh - nLow + 1);
+  int diff = nHigh - nLow + 1;
+  int randint = rand();
+//  printf("%d %d ", nLow, nHigh);
+
+	//int nRandomIndex = nLow + ((unsigned int) randint % diff);
+	int nRandomIndex = 3; //Take the third value
 	RainbowChain TempChain;
 	TempChain = pChain[nLow];
 	pChain[nLow] = pChain[nRandomIndex];
 	pChain[nRandomIndex] = TempChain;
+  //put the pivot at the start
 
 	TempChain = pChain[nLow];
 	uint64 nPivotKey = pChain[nLow].nIndexE;
@@ -46,12 +46,14 @@ int QuickSortPartition(RainbowChain* pChain, int nLow, int nHigh)
 	{
 		while (nLow < nHigh && pChain[nHigh].nIndexE >= nPivotKey)
 			nHigh--;
+
 		pChain[nLow] = pChain[nHigh];
 		while (nLow < nHigh && pChain[nLow].nIndexE <= nPivotKey)
 			nLow++;
 		pChain[nHigh] = pChain[nLow];
 	}
 	pChain[nLow] = TempChain;
+  //printf("%d %d \n", nLow, nHigh);
 	return nLow;
 }
 
@@ -245,6 +247,11 @@ void ExternalSort(FILE* file, string sTemporaryFilePathName)
 
 int main(int argc, char* argv[])
 {
+  printf("%d\n", INT_MAX);
+  printf("%d\n", RAND_MAX);
+  printf("%u\n", UINT_MAX);
+  srand(time(NULL));
+
 	if (argc != 2)
 	{
 		Logo();
@@ -290,7 +297,8 @@ int main(int argc, char* argv[])
 
 				// Sort file
 				printf("sorting rainbow table with %d chains...\n", nRainbowChainCount);
-				QuickSort(pChain, 0, nRainbowChainCount - 1);
+        std::sort( pChain, pChain + nRainbowChainCount, QuickSortCompare);
+//				QuickSort(pChain, 0, nRainbowChainCount - 1);
 
 				// Write file
 				printf("writing sorted rainbow table...\n");
