@@ -13,9 +13,6 @@
 CChainWalkSet::CChainWalkSet()
 {
 	m_sHashRoutineName   = "";
-	m_sPlainCharsetName  = "";
-	m_nPlainLenMin       = 0;
-	m_nPlainLenMax       = 0;
 	m_nRainbowTableIndex = 0;
 	m_nRainbowChainLen   = 0;
 }
@@ -37,24 +34,22 @@ void CChainWalkSet::DiscardAll()
 
 uint64* CChainWalkSet::RequestWalk(unsigned char* pHash, int nHashLen,
 								   string sHashRoutineName,
-								   string sPlainCharsetName, int nPlainLenMin, int nPlainLenMax, 
+								   string sBIN,
 								   int nRainbowTableIndex, 
 								   int nRainbowChainLen,
 								   bool& fNewlyGenerated)
 {
+  //printf("BIN requested with is %s", sBIN.c_str());
 	if (   m_sHashRoutineName   != sHashRoutineName
-		|| m_sPlainCharsetName  != sPlainCharsetName
-		|| m_nPlainLenMin       != nPlainLenMin
-		|| m_nPlainLenMax       != nPlainLenMax
+		|| m_nRainbowTableIndex != nRainbowTableIndex
+		|| m_sBIN != sBIN
 		|| m_nRainbowTableIndex != nRainbowTableIndex
 		|| m_nRainbowChainLen   != nRainbowChainLen)
 	{
 		DiscardAll();
 
 		m_sHashRoutineName   = sHashRoutineName;
-		m_sPlainCharsetName  = sPlainCharsetName;
-		m_nPlainLenMin       = nPlainLenMin;
-		m_nPlainLenMax       = nPlainLenMax;
+		m_sBIN   = sBIN;
 		m_nRainbowTableIndex = nRainbowTableIndex;
 		m_nRainbowChainLen   = nRainbowChainLen;
 

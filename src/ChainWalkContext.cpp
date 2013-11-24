@@ -9,7 +9,7 @@
 #endif
 
 #include "ChainWalkContext.h"
-
+#include <string>
 #include <ctype.h>
 #include <openssl/rand.h>
 #ifdef _WIN32
@@ -166,6 +166,11 @@ bool CChainWalkContext::SetupWithPathName(string sPathName, int& nRainbowChainLe
 string CChainWalkContext::GetHashRoutineName()
 {
 	return m_sHashRoutineName;
+}
+
+string CChainWalkContext::GetBIN()
+{
+	return std::string((char*) m_BIN);
 }
 
 int CChainWalkContext::GetHashLen()

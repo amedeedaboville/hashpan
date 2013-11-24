@@ -54,6 +54,7 @@ public:
 	static int GetHashLen();
 	static string GetPlainCharsetContent();
 	static int GetPlainLenMin();
+	static string GetBIN();
 	static int GetPlainLenMax();
 	static uint64 GetPlainSpaceTotal();
 	static int GetRainbowTableIndex();

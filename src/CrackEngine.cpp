@@ -123,9 +123,7 @@ void CCrackEngine::SearchTableChunk(RainbowChain* pChain, int nRainbowChainLen, 
 		uint64* pStartPosIndexE = m_cws.RequestWalk(TargetHash,
 													nHashLen,
 													CChainWalkContext::GetHashRoutineName(),
-													CChainWalkContext::GetPlainCharsetName(),
-													CChainWalkContext::GetPlainLenMin(),
-													CChainWalkContext::GetPlainLenMax(),
+													CChainWalkContext::GetBIN(),
 													CChainWalkContext::GetRainbowTableIndex(),
 													nRainbowChainLen,
 													fNewlyGenerated);
@@ -227,7 +225,8 @@ void CCrackEngine::SearchRainbowTable(string sPathName, CHashSet& hs)
 		// File length check
 		unsigned int nFileLen = GetFileLen(file);
 		if (nFileLen % 16 != 0 || nRainbowChainCount * 16 != nFileLen)
-			printf("file length mismatch\n");
+			printf("file length mismatch: File Length %% 16 is %d and the ChainCount*16 %d == %dlen\n",
+          nFileLen %16, nRainbowChainCount, nFileLen);
 		else
 		{
 			static CMemoryPool mp;
