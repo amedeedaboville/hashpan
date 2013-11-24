@@ -132,7 +132,8 @@ bool PrepareSortedSegment(list<CSortedSegment>& lSS, FILE* file, FILE* tempfile)
 		unsigned int nRead = fread(pMem, 1, nAvailPhys, file);
 
 		printf("sorting segment #%d...\n", i);
-		QuickSort((RainbowChain*)pMem, 0, nRead / 16 - 1);
+//		QuickSort((RainbowChain*)pMem, 0, nRead / 16 - 1);
+    std::sort((RainbowChain*) pMem, (RainbowChain*) (pMem + nRead/16 - 1), QuickSortCompare);
 
 		CSortedSegment ss(tempfile, ftell(tempfile), nRead / 16);
 		lSS.push_back(ss);
