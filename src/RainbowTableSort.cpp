@@ -17,55 +17,6 @@ bool QuickSortCompare(const RainbowChain pElem1, const RainbowChain pElem2)
 {
   return pElem1.nIndexE < pElem2.nIndexE;
 }
-/*
-void QuickSort(RainbowChain* pChain, int nRainbowChainCount)
-{
-	qsort(pChain, nRainbowChainCount, 16, QuickSortCompare);	// so slow!
-}
-*/
-
-/////////////////////////////////////////////////////////////////////////////
-
-int QuickSortPartition(RainbowChain* pChain, int nLow, int nHigh)
-{
-  int diff = nHigh - nLow + 1;
-  int randint = rand();
-//  printf("%d %d ", nLow, nHigh);
-
-	//int nRandomIndex = nLow + ((unsigned int) randint % diff);
-	int nRandomIndex = 3; //Take the third value
-	RainbowChain TempChain;
-	TempChain = pChain[nLow];
-	pChain[nLow] = pChain[nRandomIndex];
-	pChain[nRandomIndex] = TempChain;
-  //put the pivot at the start
-
-	TempChain = pChain[nLow];
-	uint64 nPivotKey = pChain[nLow].nIndexE;
-	while (nLow < nHigh)
-	{
-		while (nLow < nHigh && pChain[nHigh].nIndexE >= nPivotKey)
-			nHigh--;
-
-		pChain[nLow] = pChain[nHigh];
-		while (nLow < nHigh && pChain[nLow].nIndexE <= nPivotKey)
-			nLow++;
-		pChain[nHigh] = pChain[nLow];
-	}
-	pChain[nLow] = TempChain;
-  //printf("%d %d \n", nLow, nHigh);
-	return nLow;
-}
-
-void QuickSort(RainbowChain* pChain, int nLow, int nHigh)
-{
-	if (nLow < nHigh)
-	{
-		int nPivotLoc = QuickSortPartition(pChain, nLow, nHigh);
-		QuickSort(pChain, nLow, nPivotLoc - 1);
-		QuickSort(pChain, nPivotLoc + 1, nHigh);
-	}
-}
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -298,7 +249,6 @@ int main(int argc, char* argv[])
 				// Sort file
 				printf("sorting rainbow table with %d chains...\n", nRainbowChainCount);
         std::sort( pChain, pChain + nRainbowChainCount, QuickSortCompare);
-//				QuickSort(pChain, 0, nRainbowChainCount - 1);
 
 				// Write file
 				printf("writing sorted rainbow table...\n");
