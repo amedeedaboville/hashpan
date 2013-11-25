@@ -141,8 +141,6 @@ bool CChainWalkContext::SetupWithPathName(string sPathName, int& nRainbowChainLe
 	nRainbowChainCount        = stoi(vPart[3].c_str());
 	string sBINNumber = vPart[4];
 
-	// Parse charset definition
-
 	// Setup
 	if (!SetHashRoutine(sHashRoutineName))
 	{

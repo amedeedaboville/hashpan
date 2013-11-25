@@ -320,8 +320,12 @@ void CCrackEngine::Run(vector<string> vPathName, CHashSet& hs)
 	// Reset statistics
 	ResetStatistics();
 
-	// Sort vPathName (CChainWalkSet need it)
+  /*Code originally sorted the table filenames. I'm removing this to test.
+   * I don't see why ChainWalkSet would need sorted table filenames.
+   * It might be an assumption SearchRainbowTable() makes?
+   * -Amedee
 	int i, j;
+	// Sort vPathName (CChainWalkSet need it)
 	for (i = 0; i < vPathName.size() - 1; i++)
 		for (j = 0; j < vPathName.size() - i - 1; j++)
 		{
@@ -333,9 +337,10 @@ void CCrackEngine::Run(vector<string> vPathName, CHashSet& hs)
 				vPathName[j + 1] = sTemp;
 			}
 		}
+    */
 
 	// Run
-	for (i = 0; i < vPathName.size() && hs.AnyhashLeft(); i++)
+	for (int i = 0; i < vPathName.size() && hs.AnyhashLeft(); i++)
 	{
 		SearchRainbowTable(vPathName[i], hs);
 		printf("\n");
