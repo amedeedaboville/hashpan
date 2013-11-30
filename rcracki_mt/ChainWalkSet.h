@@ -43,9 +43,7 @@ public:
 
 private:
 	std::string m_sHashRoutineName;		// Discard all if not match
-	std::string m_sPlainCharsetName;		// Discard all if not match
-	int    m_nPlainLenMin;			// Discard all if not match
-	int    m_nPlainLenMax;			// Discard all if not match
+	std::string m_sBIN;		// Discard all if not match
 	int    m_nRainbowTableIndex;	// Discard all if not match
 	int    m_nRainbowChainLen;		// Discard all if not match
 	std::list<ChainWalk> m_lChainWalk;
@@ -62,8 +60,7 @@ private:
 
 public:
 	uint64_t* RequestWalk( unsigned char* pHash, int nHashLen
-		, std::string sHashRoutineName, std::string sPlainCharsetName
-		, int nPlainLenMin, int nPlainLenMax, int nRainbowTableIndex
+	  , std::string sHashRoutineName, std::string sBIN, int nRainbowTableIndex
 		, int nRainbowChainLen, bool& fNewlyGenerated, bool setDebug
 		, std::string sPrecalc );
 	void DiscardWalk(uint64_t* pIndexE);

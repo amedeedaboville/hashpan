@@ -42,11 +42,17 @@ public:
 	static int m_nHashLen;										// Configuration
 	static uint8_t RTfileFormatId;
 
-	static std::vector<stCharset> m_vCharset;
-	static int m_nPlainLenMinTotal, m_nPlainLenMaxTotal;
+  static unsigned char m_BIN[6];
+
+	uint64_t m_nIndexX;
+	static unsigned char m_PlainCharset[MAX_PLAIN_LEN];
+  static const int m_nPlainCharsetLen = 10;
+	static const int m_nPlainLenMin= 16;
+  static const int m_nPlainLenMax= 16;
+	static std::string m_sPlainCharsetContent;
 	static uint64_t m_nPlainSpaceUpToX[MAX_PLAIN_LEN];		// Performance consideration
 	static uint64_t m_nPlainSpaceTotal;							// Performance consideration
-	static int m_nHybridCharset;
+
 	static int m_nRainbowTableIndex;							// Configuration
 	static uint64_t m_nReduceOffset;								// Performance consideration
 	static KeySpace *m_ks;
@@ -68,13 +74,14 @@ private:
 
 public:
 	static bool SetHashRoutine( std::string sHashRoutineName );
-	static bool SetPlainCharset( std::string sCharsetName, int nPlainLenMin, int nPlainLenMax );
+	static bool SetBIN(std::string sBIN);
+	static bool SetPlainCharset();
 	static bool SetRainbowTableIndex(int nRainbowTableIndex);	
 	static bool SetSalt(unsigned char *Salt, int nSaltLength);
 	static bool SetupWithPathName( std::string sPathName, int& nRainbowChainLen, int& nRainbowChainCount );	// Wrapper
 	static std::string GetHashRoutineName();
 	static int GetHashLen();
-	static std::string GetPlainCharsetName();
+	static std::string GetBIN();
 	static std::string GetPlainCharsetContent();
 	static int GetPlainLenMin();
 	static int GetPlainLenMax();

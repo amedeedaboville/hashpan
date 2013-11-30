@@ -28,8 +28,10 @@ CC = g++
 #  add -mtune=native to OPTIMIZATION for better performance (if it works)
 OPTIMIZATION = -O3 -mtune=native
 INCLUDES = -I.
-CFLAGS = -Wall -ansi $(INCLUDES) $(OPTIMIZATION) -c $(DEBUG)
-LFLAGS = -Wall -ansi $(INCLUDES) $(OPTIMIZATION) $(DEBUG)
+#CFLAGS = -Wall -ansi $(INCLUDES) $(OPTIMIZATION) -c $(DEBUG)
+#LFLAGS = -Wall -ansi $(INCLUDES) $(OPTIMIZATION) $(DEBUG)
+CFLAGS = -Wall $(INCLUDES) $(OPTIMIZATION) -c $(DEBUG)
+LFLAGS = -Wall $(INCLUDES) $(OPTIMIZATION) $(DEBUG)
 # doesn't play well with some distros
 # LFLAGS += -filt
 LIBS = -L/lib -L/usr/lib -lcrypto -lpthread

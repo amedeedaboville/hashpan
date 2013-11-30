@@ -116,31 +116,10 @@ struct IndexRow
 	unsigned int prefixstart, numchains;
 };
 
-typedef struct
-{
-	std::string sName;
-	int nPlainLenMin;
-	int nPlainLenMax;
-} tCharset;
-
 #define MAX_PLAIN_LEN 256
 #define MIN_HASH_LEN  8
 #define MAX_HASH_LEN  256
 #define MAX_SALT_LEN  256
-
-typedef struct 
-{
-	uint64_t m_nPlainSpaceUpToX[MAX_PLAIN_LEN];		// Performance consideration
-	//unsigned char m_PlainCharset[255];
-	unsigned char m_PlainCharset[MAX_PLAIN_LEN];
-	uint64_t m_nPlainSpaceTotal;
-	uint64_t m_nIndexX;
-	unsigned int m_nPlainCharsetLen;
-	int m_nPlainLenMin;
-	int m_nPlainLenMax;
-	std::string m_sPlainCharsetName;
-	std::string m_sPlainCharsetContent;
-} stCharset;
 
 // XXX nmap is GPL2, will check newer releases regarding license
 // Code comes from nmap, used for the linux implementation of kbhit()
@@ -180,7 +159,6 @@ std::string HexToStr(const unsigned char* pData, int nLen);
 unsigned long GetAvailPhysMemorySize();
 std::string GetApplicationPath();
 void ParseHash( std::string sHash, unsigned char* pHash, int& nHashLen );
-bool GetHybridCharsets( std::string sCharset, std::vector<tCharset>& vCharset );
 void Logo();
 bool writeResultLineToFile( std::string sOutputFile, std::string sHash, std::string sPlain, std::string sBinary );
 

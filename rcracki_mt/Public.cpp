@@ -255,58 +255,6 @@ std::string TrimString( std::string s )
 
 	return s;
 }
-bool GetHybridCharsets( std::string sCharset, std::vector<tCharset>& vCharset )
-{
-	// Example: hybrid(mixalpha-numeric-all-space#6-6,numeric#1-4)
-	if(sCharset.substr(0, 6) != "hybrid") // Not hybrid charset
-		return false;
-
-	std::string::size_type nEnd = sCharset.rfind(')');
-	std::string::size_type nStart = sCharset.rfind('(');
-	std::string sChar = sCharset.substr(nStart + 1, nEnd - nStart - 1);
-	std::string commas = "";
-
-	int commaCount = std::count( sChar.begin(), sChar.end(), ',' );
-
-	for ( int i = 0; i < commaCount; i++ )
-		commas += ",";
-
-	std::vector<std::string> vParts;
-
-	if ( !SeperateString(sChar, commas, vParts) )
-	{
-		std::cout << "Failed to SeperateString: " << sChar << std::endl;
-		return false;
-	}
-
-	for(uint32_t i = 0; i < vParts.size(); i++)
-	{
-		tCharset stCharset;
-		std::vector<std::string> vParts2;
-
-		if ( !SeperateString(vParts[i], "#", vParts2) )
-		{
-			std::cout << "Failed to SeperateString: " << vParts[i] << std::endl;
-			return false;
-		}
-
-		stCharset.sName = vParts2[0];
-		std::vector<std::string> vParts3;
-
-		if( !SeperateString(vParts2[1], "-", vParts3) )
-		{
-			std::cout << "Failed to SeperateString: " << vParts2[1] << std::endl;
-			return false;
-		}
-
-		stCharset.nPlainLenMin = atoi(vParts3[0].c_str());
-		stCharset.nPlainLenMax = atoi(vParts3[1].c_str());
-
-		vCharset.push_back(stCharset);
-	}
-
-	return true;
-}
 #ifdef BOINC
 bool boinc_ReadLinesFromFile( std::string sPathName, std::vector<std::string>& vLine )
 {

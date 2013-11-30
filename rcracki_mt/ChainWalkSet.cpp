@@ -28,9 +28,7 @@
 CChainWalkSet::CChainWalkSet()
 {
 	m_sHashRoutineName   = "";
-	m_sPlainCharsetName  = "";
-	m_nPlainLenMin       = 0;
-	m_nPlainLenMax       = 0;
+	m_sBIN               = "";
 	m_nRainbowTableIndex = 0;
 	m_nRainbowChainLen   = 0;
 	debug = false;
@@ -140,7 +138,7 @@ bool CChainWalkSet::FindInFile(uint64_t* pIndexE, unsigned char* pHash, int nHas
 {
 	int gotPrecalcOnLine = -1;
 	char precalculationLine[255];
-	sprintf(precalculationLine, "%s_%s#%d-%d_%d_%d:%s\n", m_sHashRoutineName.c_str(), m_sPlainCharsetName.c_str(), m_nPlainLenMin, m_nPlainLenMax, m_nRainbowTableIndex, m_nRainbowChainLen, HexToStr(pHash, nHashLen).c_str() );
+  sprintf(precalculationLine, "%s_%d_%d:%s\n", m_sHashRoutineName.c_str(), m_nRainbowTableIndex, m_nRainbowChainLen, HexToStr(pHash, nHashLen).c_str() );
 	std::string precalcString(precalculationLine);
 
 	std::string sCurrentPrecalcPathName = "";
@@ -240,7 +238,7 @@ void CChainWalkSet::StoreToFile(uint64_t* pIndexE, unsigned char* pHash, int nHa
 			if (file!=NULL)
 			{
 				char precalculationLine[255];
-				sprintf(precalculationLine, "%s_%s#%d-%d_%d_%d:%s\n", m_sHashRoutineName.c_str(), m_sPlainCharsetName.c_str(), m_nPlainLenMin, m_nPlainLenMax, m_nRainbowTableIndex, m_nRainbowChainLen, HexToStr(pHash, nHashLen).c_str() );
+				sprintf(precalculationLine, "%s_%d_%d:%s\n", m_sHashRoutineName.c_str(), m_nRainbowTableIndex, m_nRainbowChainLen, HexToStr(pHash, nHashLen).c_str() );
 				fputs (precalculationLine, file);
 				fclose (file);
 			}
@@ -252,8 +250,7 @@ void CChainWalkSet::StoreToFile(uint64_t* pIndexE, unsigned char* pHash, int nHa
 }
 
 uint64_t* CChainWalkSet::RequestWalk( unsigned char* pHash, int nHashLen
-	, std::string sHashRoutineName, std::string sPlainCharsetName
-	, int nPlainLenMin, int nPlainLenMax, int nRainbowTableIndex
+	, std::string sHashRoutineName, std::string sBIN, int nRainbowTableIndex
 	, int nRainbowChainLen, bool& fNewlyGenerated, bool setDebug
 	, std::string sPrecalc )
 {
@@ -261,18 +258,14 @@ uint64_t* CChainWalkSet::RequestWalk( unsigned char* pHash, int nHashLen
 	sPrecalcPathName = sPrecalc;
 
 	if (   m_sHashRoutineName   != sHashRoutineName
-		|| m_sPlainCharsetName  != sPlainCharsetName
-		|| m_nPlainLenMin       != nPlainLenMin
-		|| m_nPlainLenMax       != nPlainLenMax
+		|| m_sBIN  != sBIN
 		|| m_nRainbowTableIndex != nRainbowTableIndex
 		|| m_nRainbowChainLen   != nRainbowChainLen)
 	{
 		DiscardAll();
 
 		m_sHashRoutineName   = sHashRoutineName;
-		m_sPlainCharsetName  = sPlainCharsetName;
-		m_nPlainLenMin       = nPlainLenMin;
-		m_nPlainLenMax       = nPlainLenMax;
+		m_sBIN               = sBIN;
 		m_nRainbowTableIndex = nRainbowTableIndex;
 		m_nRainbowChainLen   = nRainbowChainLen;
 
