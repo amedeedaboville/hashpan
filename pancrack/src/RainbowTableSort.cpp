@@ -199,11 +199,6 @@ void ExternalSort(FILE* file, string sTemporaryFilePathName)
 
 int main(int argc, char* argv[])
 {
-  printf("%d\n", INT_MAX);
-  printf("%d\n", RAND_MAX);
-  printf("%u\n", UINT_MAX);
-  srand(time(NULL));
-
 	if (argc != 2)
 	{
 		Logo();

@@ -6,17 +6,17 @@ tablelist=""
 counter=0
 for bin in `cat bins.txt`
 do
-  for i in {0..3};
+  for i in {0..4};
   do
-    filename="sha1_"$i"_1000x1000000_$bin.rt"
+    filename="sha1_"$i"_500x2000000_$bin.rt"
     if [ -e "$filename" ]
     then
-      tablelist="$tablelist sha1_"$i"_1000x1000000_$bin.rt"
+      tablelist="$tablelist sha1_"$i"_500x2000000_$bin.rt"
       let counter=$counter+1
     fi
   done
 done
 
-#echo $tablelist
 echo "Rainbow Table Cracking with $counter tables:"
-sudo nice -n -20 ../rcrack $tablelist -l hexhashes.txt
+sudo nice -n -20 ../rcrack $tablelist -l hexhashes.txt > log.txt
+#; pmset sleepnow
