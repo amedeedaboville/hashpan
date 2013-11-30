@@ -59,10 +59,10 @@ CChainWalkContext::~CChainWalkContext()
 {
 }
 
-bool CChainWalkContext::LoadCharset( std::string sName )
+bool CChainWalkContext::LoadCharset()
 {
   m_sPlainCharsetContent = std::string("0123456789");
-  memcpy(m_PlainCharset, "0123456789", 10);
+  memcpy(m_PlainCharset, m_sPlainCharsetContent.c_str(), 10);
   return true;
 }
 
@@ -93,13 +93,12 @@ bool CChainWalkContext::SetHashRoutine( std::string sHashRoutineName )
 
 bool CChainWalkContext::SetPlainCharset()
 {
+  if(!LoadCharset())
+    return false;
+
 	m_nPlainSpaceUpToX[0] = 0;
-  //m_nPlainLenMaxTotal = 0;
-  //m_nPlainLenMinTotal = 0;
-  //m_nPlainSpaceTotal = 0;
-  int i = 1;
   uint64_t nTemp = 1;
-  for (i = 1; i <= m_nPlainLenMax; i++)
+  for (int i = 1; i <= m_nPlainLenMax; i++)
   {			
     nTemp *= m_nPlainCharsetLen;
 
@@ -112,7 +111,7 @@ bool CChainWalkContext::SetPlainCharset()
       m_nPlainSpaceUpToX[i] = m_nPlainSpaceUpToX[i - 1] + nTemp;
     }
   }
-  m_nPlainSpaceTotal = m_nPlainSpaceUpToX[i-1];
+  m_nPlainSpaceTotal = 1e9;//m_nPlainSpaceUpToX[m_nPlainLenMax];
 
 
 	return true;
@@ -191,14 +190,16 @@ bool CChainWalkContext::SetupWithPathName( std::string sPathName, int& nRainbowC
 		return false;
 	}
 	if (!SetBIN(sBIN))
-		return false;
-	if (!SetRainbowTableIndex(nRainbowTableIndex))
-	{
-		printf("invalid rainbow table index %d\n", nRainbowTableIndex);
-		return false;
-	}
+    return false;
+  if (!SetPlainCharset())
+    return false;
+  if (!SetRainbowTableIndex(nRainbowTableIndex))
+  {
+    printf("invalid rainbow table index %d\n", nRainbowTableIndex);
+    return false;
+  }
 
-	return true;
+  return true;
 }
 
 std::string CChainWalkContext::GetHashRoutineName()
@@ -296,28 +297,50 @@ void CChainWalkContext::SetHash(unsigned char* pHash)
 {
 	memcpy(m_Hash, pHash, m_nHashLen);
 }
-
+void CChainWalkContext::Luhn() {
+  int check = 0;
+  /* Luhn Check works this way:
+   *       7 9 9 2 7 3 9 8 7 1
+   * times 1 2 1 2 1 2 1 2 1 2
+   * equals7 9 9 4 7 6 9 7 7 2
+   * sum = 67 mod 10 = 7
+   */
+  const int d[] = {0,2,4,6,8,1,3,5,7,9}; // mapping for multiplying by 2
+  int val;
+  m_Plain[15] = '0';
+  for (int i = 0; i < 16; i++) {
+  val = m_Plain[i] - '0';
+    if (i % 2 == 0)
+      check += d[val];
+    else
+      check += val;
+  }
+  m_Plain[15] = '0' + ((9 * check) % 10); //Convert our int to ASCII char, store it properly
+  /*
+  for(int i = 0; i < 16; i++) {
+    printf("%c", m_Plain[i]);
+  }
+  printf("\n");
+  */
+}
 int CChainWalkContext::normalIndexToPlain(uint64_t index, uint64_t *plainSpaceUpToX, unsigned char *charSet, int charSetLen, int min, int max, unsigned char *plain)
 {
-	int a;
 
-  printf("Indextoplain.\n");
-	for ( a = max - 1; a >= min; a-- )
-	{
-		if ( index >= plainSpaceUpToX[a])
-			break;
-	}
-
-	uint32_t plainLen = a + 1;
-
+	uint32_t plainLen = 16;
+  uint64_t nIndexOfX = m_nIndex - m_nPlainSpaceUpToX[15];
+  int a = plainLen - 1;
 	index -= plainSpaceUpToX[a]; // plainLen - 1 == a
 
-	for ( a = plainLen - 1; a >= 0; a-- )
-	{
-		// XXX this is optimized for 32-bit platforms
+  //Copies the BIN into the first 6 digits
+  for(int k = 0 ; k < 6; k++) {
+    m_Plain[k] = m_BIN[k];
+  }
+  for (int a = plainLen - 2; a >= 6; a-- ) //start from -2 because len-1 will store the luhn
+  {
+    // XXX this is optimized for 32-bit platforms
 #if defined(_WIN32) && !defined(__GNUC__)
-		if (index < 0x100000000I64)
-			break;
+    if (index < 0x100000000I64)
+      break;
 #else
 		if (index < 0x100000000llu)
 			break;
@@ -327,7 +350,7 @@ int CChainWalkContext::normalIndexToPlain(uint64_t index, uint64_t *plainSpaceUp
 	}
 
 	unsigned int index32 = (unsigned int) index;
-	for ( ; a >= 0; a-- )
+	for ( ; a >= 6; a-- )
 	{
 		// remarks from Sc00bz
 		// Note the lack of assembly code.
@@ -337,7 +360,7 @@ int CChainWalkContext::normalIndexToPlain(uint64_t index, uint64_t *plainSpaceUp
 		plain[a] = charSet[index32 % charSetLen];
 		index32 /= charSetLen;
 	}
-
+  Luhn();
 	return plainLen;
 }
 
@@ -496,6 +519,7 @@ void CChainWalkContext::HashToIndex(int nPos)
 	// breaks strict aliasing
 	//m_nIndex = (*(uint64_t*)m_Hash + m_nReduceOffset + nPos) % m_nPlainSpaceTotal;
 
+	//printf("plain space total: %s\n", uint64tostr(m_nPlainSpaceTotal).c_str());
 	memcpy( m_Hash_alias.m_Hash, m_Hash, 8 );
 
 	m_nIndex = (m_Hash_alias.alias + m_nReduceOffset + nPos) % m_nPlainSpaceTotal;

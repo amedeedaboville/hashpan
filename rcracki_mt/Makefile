@@ -26,12 +26,13 @@ CC = g++
 # -mtune=native doesn't work on NetBSD 5.1 with gcc 4.1.3 and make (fine with gmake)
 #  -mtune=native doesn't work on OSX either
 #  add -mtune=native to OPTIMIZATION for better performance (if it works)
-OPTIMIZATION = -O3 -mtune=native
+DEBUG = -g
+#OPTIMIZATION = -O3 -mtune=native
 INCLUDES = -I.
 #CFLAGS = -Wall -ansi $(INCLUDES) $(OPTIMIZATION) -c $(DEBUG)
 #LFLAGS = -Wall -ansi $(INCLUDES) $(OPTIMIZATION) $(DEBUG)
-CFLAGS = -Wall $(INCLUDES) $(OPTIMIZATION) -c $(DEBUG)
-LFLAGS = -Wall $(INCLUDES) $(OPTIMIZATION) $(DEBUG)
+CFLAGS = -Wall $(INCLUDES)  -c $(DEBUG)
+LFLAGS = -Wall $(INCLUDES)  $(DEBUG)
 # doesn't play well with some distros
 # LFLAGS += -filt
 LIBS = -L/lib -L/usr/lib -lcrypto -lpthread
