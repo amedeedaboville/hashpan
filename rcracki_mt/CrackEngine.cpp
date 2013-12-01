@@ -1075,6 +1075,7 @@ void CCrackEngine::SearchRainbowTable( std::string pathName, CHashSet& hs )
 					cwc.SetIndex( pChain[nIndexToVerify].nIndexS );
 					int nPos;
 
+						//std::cout << "about to enter loop" << std::endl;
 					for( nPos = 0; nPos < nRainbowChainLen - 1; nPos++ )
 					{
 						cwc.IndexToPlain();
@@ -1084,7 +1085,13 @@ void CCrackEngine::SearchRainbowTable( std::string pathName, CHashSet& hs )
 
 					if( cwc.GetIndex() != pChain[nIndexToVerify].nIndexE )
 					{
+            
 						std::cout << "rainbow chain length verify fail" << std::endl;
+						std::cout << " index to verify "<< cwc.GetIndex() << std::endl;
+						std::cout << " actual index "<< pChain[nIndexToVerify].nIndexE << std::endl;
+						std::cout << " corresponding plain"<< cwc.GetPlain() << std::endl;
+						std::cout << " number of Chains : "<< nChains << std::endl;
+						std::cout << " chain length:"<< nRainbowChainLen << std::endl;
 						break;
 					}
 
@@ -1105,6 +1112,7 @@ void CCrackEngine::SearchRainbowTable( std::string pathName, CHashSet& hs )
 					fVerified = true;
 				}
 
+        std::cout << "Debug: searching the file..." << std::endl;
 				// Search table chunk
 				gettimeofday( &tv, NULL );
 				SearchTableChunkOld( pChain, nRainbowChainLen, nChains, hs );

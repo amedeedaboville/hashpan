@@ -58,10 +58,10 @@ void CudaCWCExtender::Init(void) {
 		hash = rcuda::RHASH_NTLM;
 	else
 		hash = rcuda::RHASH_UNDEF;
-
-	for(ii = (int)CChainWalkContext::m_vCharset.size()-1; !(ii < 0); ii--) {
-		stCharset &chs = CChainWalkContext::m_vCharset[ii];
-		int chSetOffset = plainCharSet.size();
+//eh hard code size to 10
+	for(ii = 9; !(ii < 0); ii--) {
+		 &chs = CChainWalkContext::m_Charset[ii];
+		int chSetOffset = 10;
 		plainCharSet.append((char*)chs.m_PlainCharset, chs.m_nPlainCharsetLen);
 		uint64_t plainSpace = 1;
 		for(jj = 0; jj < ii; jj++)
@@ -69,6 +69,7 @@ void CudaCWCExtender::Init(void) {
 		plainDimVec.push_back((unsigned int)plainSpace);
 		plainDimVec.push_back((unsigned int)(plainSpace>>32));
 		for(jj = 0; jj < chs.m_nPlainLenMax; jj++) {
+      //TODO: tame the beast
 			plainDimVec.push_back((unsigned int)chs.m_nPlainCharsetLen|((unsigned int)chSetOffset<<16)|(jj<chs.m_nPlainLenMin?0:(1u<<24))|(jj+1==chs.m_nPlainLenMax?(1u<<25):0));
 			plainDimVec.push_back((unsigned int)-1/(unsigned int)chs.m_nPlainCharsetLen);
 		}

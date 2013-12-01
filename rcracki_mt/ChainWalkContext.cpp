@@ -40,7 +40,6 @@ unsigned char CChainWalkContext::m_BIN[6];
 unsigned char CChainWalkContext::m_PlainCharset[256];
 std::string CChainWalkContext::m_sPlainCharsetContent;
 
-uint64_t CChainWalkContext::m_nPlainSpaceUpToX[MAX_PLAIN_LEN];
 uint64_t CChainWalkContext::m_nPlainSpaceTotal;
 unsigned char CChainWalkContext::m_Salt[MAX_SALT_LEN];
 
@@ -80,6 +79,7 @@ bool CChainWalkContext::SetBIN(std::string sBIN)
 }
 bool CChainWalkContext::SetHashRoutine( std::string sHashRoutineName )
 {
+  std::cout <<"setting hash routine to "<< sHashRoutineName<< std::endl;
   CHashRoutine hr;
   hr.GetHashRoutine(sHashRoutineName, m_pHashRoutine, m_nHashLen);
   if (m_pHashRoutine != NULL)
@@ -96,23 +96,8 @@ bool CChainWalkContext::SetPlainCharset()
   if(!LoadCharset())
     return false;
 
-	m_nPlainSpaceUpToX[0] = 0;
-  uint64_t nTemp = 1;
-  for (int i = 1; i <= m_nPlainLenMax; i++)
-  {			
-    nTemp *= m_nPlainCharsetLen;
-
-    if (i < m_nPlainLenMin)
-    {
-      m_nPlainSpaceUpToX[i] = 0;
-    }
-    else
-    {
-      m_nPlainSpaceUpToX[i] = m_nPlainSpaceUpToX[i - 1] + nTemp;
-    }
-  }
-  m_nPlainSpaceTotal = 1e9;//m_nPlainSpaceUpToX[m_nPlainLenMax];
-
+  m_nPlainSpaceTotal = 1e9;//removed a lot of stuff here because we only have one plain length.
+  printf("plain subkey space total: %s\n", uint64tostr(m_nPlainSpaceTotal).c_str());
 
 	return true;
 }
@@ -222,16 +207,6 @@ std::string CChainWalkContext::GetPlainCharsetContent()
 	return m_sPlainCharsetContent;
 }
 
-int CChainWalkContext::GetPlainLenMin()
-{
-	return m_nPlainLenMin;
-}
-
-int CChainWalkContext::GetPlainLenMax()
-{
-	return m_nPlainLenMax;
-}
-
 uint64_t CChainWalkContext::GetPlainSpaceTotal()
 {
 	return m_nPlainSpaceTotal;
@@ -260,10 +235,6 @@ void CChainWalkContext::Dump()
   }
   printf("\n");
 
-  for ( int j = 0; j <= m_nPlainLenMax; j++ )
-  {
-    printf( "m_vCharset.m_nPlainSpaceUpToX[%d]: %"PRIu64"\n" , j, m_nPlainSpaceUpToX[j] );
-  }
 
   printf("plain charset in hex: ");
 
@@ -273,10 +244,6 @@ void CChainWalkContext::Dump()
 
   printf("plain subkey space total: %s\n", uint64tostr(m_nPlainSpaceTotal).c_str());
 		
-	for ( int i = 0; i <= m_nPlainLenMax; i++ )
-	{
-		printf( "m_nPlainSpaceUpToX[%d]: %"PRIu64"\n" , i, m_nPlainSpaceUpToX[i] );
-	}
 
 	//printf("plain charset content: %s\n", m_sPlainCharsetContent.c_str());
 	//for (i = 0; i <= m_nPlainLenMax; i++)
@@ -323,195 +290,57 @@ void CChainWalkContext::Luhn() {
   printf("\n");
   */
 }
-int CChainWalkContext::normalIndexToPlain(uint64_t index, uint64_t *plainSpaceUpToX, unsigned char *charSet, int charSetLen, int min, int max, unsigned char *plain)
+void CChainWalkContext::IndexToPlain()
 {
 
-	uint32_t plainLen = 16;
-  uint64_t nIndexOfX = m_nIndex - m_nPlainSpaceUpToX[15];
-  int a = plainLen - 1;
-	index -= plainSpaceUpToX[a]; // plainLen - 1 == a
+	uint32_t plainLen = 16; //m_nPlainSpace up to X, in our case is 15 0's, then 1 1billion. Not that useful
+	uint64_t index = m_nIndex;// - m_nPlainSpaceUpToX[a]; // plainLen - 1 == a
+  int a;
+
+  //amedee: Combining the loops because I'm 64bits osx
+  for (a = plainLen - 2; a >= 6; a-- ) //start from -2 because len-1 will store the luhn
+  {
+		m_Plain[a] = m_PlainCharset[index % m_nPlainCharsetLen];
+		index /= m_nPlainCharsetLen;
+	}
 
   //Copies the BIN into the first 6 digits
-  for(int k = 0 ; k < 6; k++) {
-    m_Plain[k] = m_BIN[k];
+  for(a = 5 ; a >= 0; a--) {
+    m_Plain[a] = m_BIN[a];
   }
-  for (int a = plainLen - 2; a >= 6; a-- ) //start from -2 because len-1 will store the luhn
-  {
-    // XXX this is optimized for 32-bit platforms
-#if defined(_WIN32) && !defined(__GNUC__)
-    if (index < 0x100000000I64)
-      break;
-#else
-		if (index < 0x100000000llu)
-			break;
-#endif
-		plain[a] = charSet[index % charSetLen];
-		index /= charSetLen;
-	}
-
-	unsigned int index32 = (unsigned int) index;
-	for ( ; a >= 6; a-- )
-	{
-		// remarks from Sc00bz
-		// Note the lack of assembly code.
-		// Assembly code is not needed since all the variables are in the stack.
-		// If you add in assembly code it will be slower than the compiler's code.
-
-		plain[a] = charSet[index32 % charSetLen];
-		index32 /= charSetLen;
-	}
+    
+  // remarks from Sc00bz
+  // Note the lack of assembly code.
+  // Assembly code is not needed since all the variables are in the stack.
+  // If you add in assembly code it will be slower than the compiler's code.
+    
   Luhn();
-	return plainLen;
 }
+  /*std::cout << "index " << m_nIndex << ": ";
+  for(int i = 0; i < 16; i++) {
+    printf("%c", m_Plain[i]);
+  }
+  printf("\n");
+  */
 
-void CChainWalkContext::IndexToPlain()
-{
-		m_nPlainLen = 0;
-		uint64_t indexTmp = m_nIndex;
-
-/*
-		for ( uint32_t a = 0; a < numKeySpaces - 1; a++ )
-		{
-			m_vCharset[a].m_nIndexX = indexTmp % m_vCharset[a].m_nPlainSpaceTotal;
-			indexTmp /= m_vCharset[a].m_nPlainSpaceTotal;
-			m_nPlainLen += normalIndexToPlain(m_vCharset[a].m_nIndexX, m_vCharset[a].m_nPlainSpaceUpToX, m_vCharset[a].m_PlainCharset, m_vCharset[a].m_nPlainCharsetLen, m_vCharset[a].m_nPlainLenMin, m_vCharset[a].m_nPlainLenMax, m_Plain + m_nPlainLen);
-		}
-    */
-		m_nIndexX = indexTmp;
-		m_nPlainLen += normalIndexToPlain(m_nIndexX, m_nPlainSpaceUpToX, m_PlainCharset, m_nPlainCharsetLen, m_nPlainLenMin, m_nPlainLenMax, m_Plain + m_nPlainLen);
-}
-
-
-/*
-void CChainWalkContext::IndexToPlain()
-{
-	int i;
-	m_nPlainLen = 0;
-	for (i = m_nPlainLenMaxTotal - 1; i >= m_nPlainLenMinTotal - 1; i--)
-	{
-		if (m_nIndex >= m_nPlainSpaceUpToX[i])
-		{
-			m_nPlainLen = i + 1;
-			break;
-		}
-	}
-	if(m_nPlainLen == 0)
-		m_nPlainLen = m_nPlainLenMinTotal;
-	uint64_t nIndexOfX = m_nIndex - m_nPlainSpaceUpToX[m_nPlainLen - 1];
-
-// this is the generic code for non x86/x86_64 platforms
-#if !defined(_M_X64) && !defined(_M_IX86) && !defined(__i386__) && !defined(__x86_64__)
-	
-	// generic version (slow for non 64-bit platforms and gcc < 4.5.x)
-	for (i = m_nPlainLen - 1; i >= 0; i--)
-	{
-		int nCharsetLen = 0;
-		for(uint32_t j = 0; j < m_vCharset.size(); j++)
-		{
-			nCharsetLen += m_nPlainLenMax;
-			if(i < nCharsetLen) // We found the correct charset
-			{
-				m_Plain[i] = m_PlainCharset[nIndexOfX % m_nPlainCharsetLen];
-				nIndexOfX /= m_nPlainCharsetLen;
-				break;
-			}
-		}
-	}
-
-#elif defined(_M_X64) || defined(_M_IX86) || defined(__i386__) || defined(__x86_64__)
-
-	// Fast ia32 version
-	for (i = m_nPlainLen - 1; i >= 0; i--)
-	{
-		// 0x100000000 = 2^32
-#ifdef _M_IX86
-		if (nIndexOfX < 0x100000000I64)
-			break;
-#else
-		if (nIndexOfX < 0x100000000llu)
-			break;
-#endif
-
-		int nCharsetLen = 0;
-		for(uint32_t j = 0; j < m_vCharset.size(); j++)
-		{
-			nCharsetLen += m_nPlainLenMax;
-			if(i < nCharsetLen) // We found the correct charset
-			{
-				m_Plain[i] = m_PlainCharset[nIndexOfX % m_nPlainCharsetLen];
-				nIndexOfX /= m_nPlainCharsetLen;
-				break;
-			}
-		}
-	}
-
-	uint32_t nIndexOfX32 = (uint32_t)nIndexOfX;
-	for (; i >= 0; i--)
-	{
-		int nCharsetLen = 0;
-		for(uint32_t j = 0; j < m_vCharset.size(); j++)
-		{
-			nCharsetLen += m_nPlainLenMax;
-			if(i < nCharsetLen) // We found the correct charset
-			{
-
-				m_Plain[i] = m_PlainCharset[nIndexOfX % m_nPlainCharsetLen];
-				nIndexOfX /= m_nPlainCharsetLen;
-				break;
-			}
-		}
-	}
-
-	uint32_t nIndexOfX32 = (uint32_t)nIndexOfX;
-	for (; i >= 0; i--)
-	{
-		int nCharsetLen = 0;
-		for(uint32_t j = 0; j < m_vCharset.size(); j++)
-		{
-			nCharsetLen += m_nPlainLenMax;
-			if(i < nCharsetLen) // We found the correct charset
-			{
-
-//		m_Plain[i] = m_PlainCharset[nIndexOfX32 % m_nPlainCharsetLen];
-//		nIndexOfX32 /= m_nPlainCharsetLen;
-
-//	moving nPlainCharsetLen into the asm body and avoiding the extra temp
-//	variable results in a performance gain
-//				unsigned int nPlainCharsetLen = m_nPlainCharsetLen;
-				unsigned int nTemp;
-
-#if defined(_WIN32) && !defined(__GNUC__)
-		// VC++ still needs this
-		unsigned int nPlainCharsetLen = m_nPlainCharsetLen;
-
-		__asm
-		{
-			mov eax, nIndexOfX32
-			xor edx, edx
-			div nPlainCharsetLen
-			mov nIndexOfX32, eax
-			mov nTemp, edx
-		}
-		m_Plain[i] = m_PlainCharset[nTemp];
-#else
-		__asm__ __volatile__ ("xor %%edx, %%edx;"
-								"divl %3;"
-								: "=a"(nIndexOfX32), "=d"(nTemp)
-								: "a"(nIndexOfX32), "rm"(m_nPlainCharsetLen)
-								: );
-		m_Plain[i] = m_PlainCharset[nTemp];
-#endif
-		break;
-			}
-		}
-	}
-#endif
-}
-*/
 
 void CChainWalkContext::PlainToHash()
 {	
-	m_pHashRoutine(m_Plain, m_nPlainLen, m_Hash);
+//  for(int i = 0; i < 6; i++) {
+//    printf("%c", m_BIN[i]);
+//  }
+//  printf("   ");
+//  for(int i = 0; i < 16; i++) {
+//    printf("%c", m_Plain[i]);
+//  }
+//  printf("   ");
+//  for (int i = 0; i < 20; i++)
+//  {
+//      if (i > 0) printf(":");
+//          printf("%02X", m_Hash[i]);
+//  }
+//  printf("\n");
+	m_pHashRoutine(m_Plain, 16, m_Hash);
 }
 
 void CChainWalkContext::HashToIndex(int nPos)

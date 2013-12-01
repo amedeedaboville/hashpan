@@ -47,10 +47,7 @@ public:
 	uint64_t m_nIndexX;
 	static unsigned char m_PlainCharset[MAX_PLAIN_LEN];
   static const int m_nPlainCharsetLen = 10;
-	static const int m_nPlainLenMin= 16;
-  static const int m_nPlainLenMax= 16;
 	static std::string m_sPlainCharsetContent;
-	static uint64_t m_nPlainSpaceUpToX[MAX_PLAIN_LEN];		// Performance consideration
 	static uint64_t m_nPlainSpaceTotal;							// Performance consideration
 
 	static int m_nRainbowTableIndex;							// Configuration

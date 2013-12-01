@@ -167,14 +167,19 @@ bool CChainWalkSet::FindInFile(uint64_t* pIndexE, unsigned char* pHash, int nHas
 
 				// Parse
 				std::vector<std::string> vPart;
-				if (SeperateString(precalcLines[j], "___:", vPart))
+				if (SeperateString(precalcLines[j], "__:", vPart))
 				{
+          //0 is hashroutine
+          //1 is index
+          //2 is offset
+          //3 is hash
 					// add to offset
-					offset += ((atoi(vPart[3].c_str())-1) * sizeof(uint64_t));
+					offset += ((atoi(vPart[2].c_str())-1) * sizeof(uint64_t));
 				}
 				else {
 					// corrupt file
 					printf("Corrupted precalculation file!\n");
+          std::cout<< "filename is " <<precalcLines[j] << std::endl;
 					gotPrecalcOnLine = -1;
 					break;
 				}
