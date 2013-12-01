@@ -230,7 +230,7 @@ int main(int argc, char* argv[])
 		// QuickSort or ExternalSort
 		if (nAvailPhys >= nFileLen || nFileLen <= ASSUMED_MIN_MEMORY)
 		{
-			int nRainbowChainCount = nFileLen / 16;
+			int nRainbowChainCount = nFileLen / 8;
 			RainbowChainO* pChain = (RainbowChainO*)new unsigned char[nFileLen];
 			if (pChain != NULL)
 			{
