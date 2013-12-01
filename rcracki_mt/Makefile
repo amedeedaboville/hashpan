@@ -44,6 +44,7 @@ GENOBJS = BaseRTReader.o ChainWalkContext.o ChainWalkSet.o CrackEngine.o \
 	fast_md4.o fast_md5.o HashAlgorithm.o HashRoutine.o HashSet.o keyspace.o \
 	lm2ntlm.o MemoryPool.o Public.o RainbowTableGenerate.o rcrackiThread.o RTReader.o \
 	RTIReader.o RTI2Reader.o
+SORTOBJS = Public.o PanSort.o
 COMMON_API_PATH = .
 CUDA_SHARED_PATH = ../../boinc_software/boinc_client_apps/distrrtgen_cuda
 #sha1.o
@@ -68,13 +69,17 @@ LIBS += ${LIBS_$(OSNAME)}
 RELEASE_DIR = rcracki_mt
 
 #all: rcracki_mt strip
-all: rcracki_mt pangen
+all: pancrack pansort pangen
 
-rcracki_mt: $(CRACKOBJS)
-	$(CC) $(LFLAGS) $(CRACKOBJS) $(LIBS) -o rcracki_mt
+pancrack: $(CRACKOBJS)
+	$(CC) $(LFLAGS) $(CRACKOBJS) $(LIBS) -o pancrack
+	cp pancrack tables/
 pangen: $(GENOBJS)
 	$(CC) $(LFLAGS) $(GENOBJS) $(LIBS) -o pangen
 	cp pangen tables/
+pansort: $(SORTOBJS)
+	$(CC) $(LFLAGS) $(SORTOBJS) $(LIBS) -o pansort
+	cp pansort tables/
 
 clean:
 	rm -f core *.o *.gcno *.gcda *.gcov rcracki_mt rcracki.session \
@@ -229,6 +234,9 @@ Public.o: $(COMMON_API_PATH)/Public.h $(COMMON_API_PATH)/Public.cpp \
 
 RainbowCrack.o: RainbowCrack.h RainbowCrack.cpp CrackEngine.h lm2ntlm.h
 	$(CC) $(CFLAGS) RainbowCrack.cpp
+
+PanSort.o: 
+	$(CC) $(CFLAGS) PanSort.cpp
 
 rcrackiThread.o: rcrackiThread.h rcrackiThread.cpp \
 	$(COMMON_API_PATH)/ChainWalkContext.h $(COMMON_API_PATH)/Public.h HashSet.h

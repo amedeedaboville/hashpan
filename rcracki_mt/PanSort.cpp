@@ -8,12 +8,13 @@
 #include <time.h>
 #include <algorithm>
 
+using namespace std;
 #define ASSUMED_MIN_MEMORY 32 * 1024 * 1024
 
 /////////////////////////////////////////////////////////////////////////////
 
 
-bool QuickSortCompare(const RainbowChain pElem1, const RainbowChain pElem2)
+bool QuickSortCompare(const RainbowChainO pElem1, const RainbowChainO pElem2)
 {
   return pElem1.nIndexE < pElem2.nIndexE;
 }
@@ -36,7 +37,7 @@ public:
 	}
 
 private:
-	RainbowChain m_Chain[SORTED_SEGMENT_MAX_CHAIN_IN_MEMORY];
+	RainbowChainO m_Chain[SORTED_SEGMENT_MAX_CHAIN_IN_MEMORY];
 	int m_nChainCount;
 	int m_nNextChainIndex;
 
@@ -45,7 +46,7 @@ private:
 	int m_nFileChainCount;
 
 public:
-	RainbowChain* GetNextChain()	// Don't call this if no chain left
+	RainbowChainO* GetNextChain()	// Don't call this if no chain left
 	{
 		if (m_nChainCount == m_nNextChainIndex)
 		{
@@ -57,10 +58,10 @@ public:
 
 			//printf("reading... (offset = %u, chain count = %d)\n", m_nFileChainOffset, nChainCountToRead);
 			fseek(m_file, m_nFileChainOffset, SEEK_SET);
-			fread(m_Chain, 1, sizeof(RainbowChain) * nChainCountToRead, m_file);
+			fread(m_Chain, 1, sizeof(RainbowChainO) * nChainCountToRead, m_file);
 			m_nChainCount       = nChainCountToRead;
 			m_nNextChainIndex   = 0;
-			m_nFileChainOffset += sizeof(RainbowChain) * nChainCountToRead;
+			m_nFileChainOffset += sizeof(RainbowChainO) * nChainCountToRead;
 			m_nFileChainCount  -= nChainCountToRead;
 		}
 
@@ -132,8 +133,8 @@ bool PrepareSortedSegment(list<CSortedSegment>& lSS, FILE* file, FILE* tempfile)
 		unsigned int nRead = fread(pMem, 1, nAvailPhys, file);
 
 		printf("sorting segment #%d...\n", i);
-//		QuickSort((RainbowChain*)pMem, 0, nRead / 16 - 1);
-    std::sort((RainbowChain*) pMem, (RainbowChain*) (pMem + nRead/16 - 1), QuickSortCompare);
+//		QuickSort((RainbowChainO*)pMem, 0, nRead / 16 - 1);
+    std::sort((RainbowChainO*) pMem, (RainbowChainO*) (pMem + nRead/16 - 1), QuickSortCompare);
 
 		CSortedSegment ss(tempfile, ftell(tempfile), nRead / 16);
 		lSS.push_back(ss);
@@ -156,7 +157,7 @@ void MergeSortedSegment(list<CSortedSegment>& lSS, FILE* file)
 	while (!lSS.empty())
 	{
 		list<CSortedSegment>::iterator MinIt;
-		uint64 nMinIndexE;
+		uint64_t nMinIndexE;
 		list<CSortedSegment>::iterator it;
 		for (it = lSS.begin(); it != lSS.end(); it++)
 		{
@@ -201,7 +202,7 @@ int main(int argc, char* argv[])
 {
 	if (argc != 2)
 	{
-		Logo();
+		//Logo();
 
 		printf("usage: rtsort rainbow_table_pathname\n");
 		return 0;
@@ -230,7 +231,7 @@ int main(int argc, char* argv[])
 		if (nAvailPhys >= nFileLen || nFileLen <= ASSUMED_MIN_MEMORY)
 		{
 			int nRainbowChainCount = nFileLen / 16;
-			RainbowChain* pChain = (RainbowChain*)new unsigned char[nFileLen];
+			RainbowChainO* pChain = (RainbowChainO*)new unsigned char[nFileLen];
 			if (pChain != NULL)
 			{
 				// Load file
