@@ -95,9 +95,9 @@ RTReader::RTReader(uint32_t chCount, uint32_t chLength, uint32_t tblIdx, uint32_
 void RTReader::RTReaderInit()
 {
 	// bytes per chain
-	this->chainSize = 16;
-	setStartPointBits(8);
-	setEndPointBits(8);
+	this->chainSize = 8;
+	setStartPointBits(4);
+	setEndPointBits(4);
 }
 
 /// Deconstructor
@@ -148,17 +148,17 @@ uint32_t RTReader::getChainsLeft()
 /// getMinimumStartPoint
 uint64_t RTReader::getMinimumStartPoint()
 {
-	uint64_t tmpStartPoint;
-	uint64_t tmpEndPoint;
-	uint64_t minimumStartPoint = (uint64_t)-1;
+	uint32_t tmpStartPoint;
+	uint32_t tmpEndPoint;
+	uint64_t minimumStartPoint = (uint32_t)-1;
 	long originalFilePos = ftell( data );
 
 	rewind( data );
 
 	while ( !feof( data ) )
 	{
-		fread( &tmpStartPoint, 8, 1, data );
-		fread( &tmpEndPoint, 8, 1, data );
+		fread( &tmpStartPoint, 4, 1, data );
+		fread( &tmpEndPoint, 4, 1, data );
 
 		if ( tmpStartPoint < minimumStartPoint )
 			minimumStartPoint = tmpStartPoint;

@@ -59,8 +59,8 @@
 
 struct RainbowChainO
 {
-	uint64_t nIndexS;
-	uint64_t nIndexE;
+	uint32_t nIndexS;
+	uint32_t nIndexE;
 };
 
 #if defined(_WIN32) && !defined(__GNUC__)

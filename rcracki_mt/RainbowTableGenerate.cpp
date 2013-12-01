@@ -202,8 +202,10 @@ int main(int argc, char* argv[])
 	for (i = nDataLen / 16; i < nRainbowChainCount; i++)
 	{
 		cwc.GenerateRandomIndex();
-		uint32_t nIndex = cwc.GetIndex();
-		if (fwrite(&nIndex, sizeof(nIndex), 1, file) != 8)
+		uint32_t nIndex = cwc.GetIndex() & 0xFFFFFFFF; //Not sure about the exact bits, but it works
+    //size_t res = fwrite(&nIndex, sizeof(nIndex), 1, file);
+		//if (res!= 4)
+		if (fwrite(&nIndex, sizeof(nIndex), 1, file) != 1)
 		{
 			printf("disk write fail\n");
 			break;
@@ -217,8 +219,8 @@ int main(int argc, char* argv[])
 			cwc.HashToIndex(nPos);
 		}
 
-		nIndex = cwc.GetIndex();
-		if (fwrite(&nIndex, sizeof(nIndex), 1, file) != 8)
+		nIndex = cwc.GetIndex() & 0xFFFFFFFF;
+		if (fwrite(&nIndex, sizeof(nIndex), 1, file) != 1)
 		{
 			printf("disk write fail\n");
 			break;

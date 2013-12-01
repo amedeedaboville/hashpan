@@ -38,7 +38,7 @@ LFLAGS = -Wall $(INCLUDES)  $(DEBUG)
 LIBS = -L/lib -L/usr/lib -lcrypto -lpthread
 CRACKOBJS = BaseRTReader.o ChainWalkContext.o ChainWalkSet.o CrackEngine.o \
 	fast_md4.o fast_md5.o HashAlgorithm.o HashRoutine.o HashSet.o keyspace.o \
-	lm2ntlm.o MemoryPool.o Public.o RainbowCrack.o RainbowTableGenerate.o \
+	lm2ntlm.o MemoryPool.o Public.o RainbowCrack.o  \
 	rcrackiThread.o RTReader.o RTIReader.o RTI2Reader.o
 GENOBJS = BaseRTReader.o ChainWalkContext.o ChainWalkSet.o CrackEngine.o \
 	fast_md4.o fast_md5.o HashAlgorithm.o HashRoutine.o HashSet.o keyspace.o \
