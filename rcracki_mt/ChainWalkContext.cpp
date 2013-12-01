@@ -28,6 +28,7 @@
 #include "ChainWalkContext.h"
 
 #include <ctype.h>
+#include <openssl/rand.h> //What's wrong with a little openssl?-Amedee
 
 //////////////////////////////////////////////////////////////////////
 
@@ -322,7 +323,11 @@ void CChainWalkContext::IndexToPlain()
   }
   printf("\n");
   */
-
+void CChainWalkContext::GenerateRandomIndex()
+{
+  RAND_bytes((unsigned char*)&m_nIndex, 8);
+  m_nIndex = m_nIndex % m_nPlainSpaceTotal;
+}
 
 void CChainWalkContext::PlainToHash()
 {	

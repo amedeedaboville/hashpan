@@ -16,6 +16,7 @@
 #include <time.h>
 
 #include "ChainWalkContext.h"
+using namespace std;
 
 void Usage()
 {
@@ -111,7 +112,7 @@ int main(int argc, char* argv[])
 	{
 		if (strcmp(argv[5], "-bench") == 0)
 		{
-			Bench(argv[1], argv[2], stoi(argv[3]));
+			Bench(argv[1], argv[2], atoi(argv[3]));
 			return 0;
 		}
 	}
@@ -124,10 +125,10 @@ int main(int argc, char* argv[])
 
 	string sHashRoutineName  = argv[1];
 	string sBINNumber        = argv[2];
-	int nRainbowTableIndex   = stoi(argv[3]);
+	int nRainbowTableIndex   = atoi(argv[3]);
 
-	int nRainbowChainLen     = stoi(argv[4]);
-	int nRainbowChainCount   = stoi(argv[5]);
+	int nRainbowChainLen     = atoi(argv[4]);
+	int nRainbowChainCount   = atoi(argv[5]);
 	string sFileTitleSuffix  = argv[6];
 
 	// nRainbowChainCount check
@@ -200,7 +201,7 @@ int main(int argc, char* argv[])
 	for (i = nDataLen / 16; i < nRainbowChainCount; i++)
 	{
 		cwc.GenerateRandomIndex();
-		uint64 nIndex = cwc.GetIndex();
+		uint64_t nIndex = cwc.GetIndex();
 		if (fwrite(&nIndex, 1, 8, file) != 8)
 		{
 			printf("disk write fail\n");

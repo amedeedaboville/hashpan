@@ -63,6 +63,7 @@ public:
 	static int m_nSaltLen;
 private:
 	static bool LoadCharset();
+  void Luhn();
 	union
 	{
 		unsigned char m_Hash[8];
@@ -90,8 +91,8 @@ public:
 	void SetIndex(uint64_t nIndex);
 	void SetHash(unsigned char* pHash);		// The length should be m_nHashLen
 
+  void GenerateRandomIndex();
 	void IndexToPlain();
-  void Luhn();
 	int normalIndexToPlain(uint64_t index, uint64_t *plainSpaceUpToX, unsigned char *charSet, int charSetLen, int min, int max, unsigned char *plain);
 	void PlainToHash();
 	void HashToIndex(int nPos);
