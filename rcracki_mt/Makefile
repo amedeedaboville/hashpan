@@ -68,12 +68,12 @@ LIBS += ${LIBS_$(OSNAME)}
 RELEASE_DIR = rcracki_mt
 
 #all: rcracki_mt strip
-all: rcracki_mt
+all: rcracki_mt pangen
 
 rcracki_mt: $(CRACKOBJS)
 	$(CC) $(LFLAGS) $(CRACKOBJS) $(LIBS) -o rcracki_mt
 pangen: $(GENOBJS)
-	$(CC) $(LFLAGS) $(GENOBJS) $(LIBS) -o rcracki_mt
+	$(CC) $(LFLAGS) $(GENOBJS) $(LIBS) -o pangen
 
 clean:
 	rm -f core *.o *.gcno *.gcda *.gcov rcracki_mt rcracki.session \
