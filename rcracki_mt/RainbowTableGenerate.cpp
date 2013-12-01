@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	if (!CChainWalkContext::SetBIN(sBINNumber))
-		return false;
+		return 0;
 	if (!CChainWalkContext::SetPlainCharset())
 		return 0;
 	if (!CChainWalkContext::SetRainbowTableIndex(nRainbowTableIndex))
@@ -196,13 +196,14 @@ int main(int argc, char* argv[])
 	// Generate rainbow table
 	printf("generating...\n");
 	CChainWalkContext cwc;
+
 	clock_t t1 = clock();
 	int i;
 	for (i = nDataLen / 16; i < nRainbowChainCount; i++)
 	{
 		cwc.GenerateRandomIndex();
-		uint64_t nIndex = cwc.GetIndex();
-		if (fwrite(&nIndex, 1, 8, file) != 8)
+		uint32_t nIndex = cwc.GetIndex();
+		if (fwrite(&nIndex, sizeof(nIndex), 1, file) != 8)
 		{
 			printf("disk write fail\n");
 			break;
@@ -217,7 +218,7 @@ int main(int argc, char* argv[])
 		}
 
 		nIndex = cwc.GetIndex();
-		if (fwrite(&nIndex, 1, 8, file) != 8)
+		if (fwrite(&nIndex, sizeof(nIndex), 1, file) != 8)
 		{
 			printf("disk write fail\n");
 			break;

@@ -74,6 +74,7 @@ rcracki_mt: $(CRACKOBJS)
 	$(CC) $(LFLAGS) $(CRACKOBJS) $(LIBS) -o rcracki_mt
 pangen: $(GENOBJS)
 	$(CC) $(LFLAGS) $(GENOBJS) $(LIBS) -o pangen
+	cp pangen tables/
 
 clean:
 	rm -f core *.o *.gcno *.gcda *.gcov rcracki_mt rcracki.session \
