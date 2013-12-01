@@ -36,9 +36,13 @@ LFLAGS = -Wall $(INCLUDES)  $(DEBUG)
 # doesn't play well with some distros
 # LFLAGS += -filt
 LIBS = -L/lib -L/usr/lib -lcrypto -lpthread
-OBJS = BaseRTReader.o ChainWalkContext.o ChainWalkSet.o CrackEngine.o \
+CRACKOBJS = BaseRTReader.o ChainWalkContext.o ChainWalkSet.o CrackEngine.o \
 	fast_md4.o fast_md5.o HashAlgorithm.o HashRoutine.o HashSet.o keyspace.o \
-	lm2ntlm.o MemoryPool.o Public.o RainbowCrack.o rcrackiThread.o RTReader.o \
+	lm2ntlm.o MemoryPool.o Public.o RainbowCrack.o RainbowTableGenerate.o \
+	rcrackiThread.o RTReader.o RTIReader.o RTI2Reader.o
+GENOBJS = BaseRTReader.o ChainWalkContext.o ChainWalkSet.o CrackEngine.o \
+	fast_md4.o fast_md5.o HashAlgorithm.o HashRoutine.o HashSet.o keyspace.o \
+	lm2ntlm.o MemoryPool.o Public.o RainbowTableGenerate.o rcrackiThread.o RTReader.o \
 	RTIReader.o RTI2Reader.o
 COMMON_API_PATH = .
 CUDA_SHARED_PATH = ../../boinc_software/boinc_client_apps/distrrtgen_cuda
@@ -61,19 +65,15 @@ LIBS_NetBSD = -ldes
 
 LIBS += ${LIBS_$(OSNAME)}
 
-RELEASE_DIR = rcracki_mt_0.7.0_src
+RELEASE_DIR = rcracki_mt
 
 #all: rcracki_mt strip
 all: rcracki_mt
 
-gui: CFLAGS += -DGUI=1
-gui: CFLAGS += -I../rcracki_mt-gui/gui
-gui: CFLAGS += $(shell pkg-config --cflags gtk+-2.0)
-gui: LFLAGS += $(shell pkg-config --libs gtk+-2.0)
-gui: $(OBJS)
-
-rcracki_mt: $(OBJS)
-	$(CC) $(LFLAGS) $(OBJS) $(LIBS) -o rcracki_mt
+rcracki_mt: $(CRACKOBJS)
+	$(CC) $(LFLAGS) $(CRACKOBJS) $(LIBS) -o rcracki_mt
+pangen: $(GENOBJS)
+	$(CC) $(LFLAGS) $(GENOBJS) $(LIBS) -o rcracki_mt
 
 clean:
 	rm -f core *.o *.gcno *.gcda *.gcov rcracki_mt rcracki.session \
