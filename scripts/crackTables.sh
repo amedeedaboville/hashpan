@@ -18,6 +18,4 @@ do
 done
 
 echo "Rainbow Table Cracking with $counter tables:"
-sudo nice -n -20 ../pancrack $tablelist -l hexhashes.txt -t $1 
-#> log.txt
-#; pmset sleepnow
+sudo nice -n -20 ./pancrack $tablelist -l hexhashes.txt -t $1 
