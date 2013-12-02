@@ -11,7 +11,9 @@ make the tables with
 crack the hashes with
 ./crackTables $NUMTHREADS
 
-NB pangen takes the list of hashes in hex.
+NB
+requires sudo access to set the cracking at max priority.
+pangen takes the list of hashes in hex.
 
 Clover HashPAN Challenge
 ========================
