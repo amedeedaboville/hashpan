@@ -1463,7 +1463,7 @@ void CCrackEngine::Run(std::vector<std::string> vPathName, CHashSet& hs, int i_m
 	ResetStatistics();
 
 	// Sort vPathName (CChainWalkSet need it)
-	std::sort(vPathName.begin(), vPathName.end());
+	//std::sort(vPathName.begin(), vPathName.end());
 
 	// Run
 	for (i = 0; i < vPathName.size() && hs.AnyhashLeft(); i++)
