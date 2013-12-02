@@ -1,5 +1,5 @@
 /*
- * freerainbowtables is a project for generating, distributing, and using
+e* freerainbowtables is a project for generating, distributing, and using
  * perfect rainbow tables
  *
  * Copyright (C) Zhu Shuanglei <shuanglei@hotmail.com>
@@ -136,6 +136,9 @@ void CChainWalkSet::removePrecalcFiles()
 
 bool CChainWalkSet::FindInFile(uint64_t* pIndexE, unsigned char* pHash, int nHashLen)
 {
+  //This is useless because we have a new BIN every file.
+  //Potential for speedup across tables of the same BIN, but later.
+  return false;
 	int gotPrecalcOnLine = -1;
 	char precalculationLine[255];
   sprintf(precalculationLine, "%s_%d_%d:%s\n", m_sHashRoutineName.c_str(), m_nRainbowTableIndex, m_nRainbowChainLen, HexToStr(pHash, nHashLen).c_str() );
@@ -189,11 +192,11 @@ bool CChainWalkSet::FindInFile(uint64_t* pIndexE, unsigned char* pHash, int nHas
 
 	if (gotPrecalcOnLine > -1)
 	{
-		if (debug)
-		{
-			std::cout << "Debug: Reading pre calculations from file, line "
-				<< gotPrecalcOnLine << " offset " << offset << std::endl;
-		}
+//		if (debug)
+//		{
+//			std::cout << "Debug: Reading pre calculations from file, line "
+//				<< gotPrecalcOnLine << " offset " << offset << std::endl;
+//		}
 		
 		FILE* fp = fopen(sCurrentPrecalcPathName.c_str(), "rb");
 

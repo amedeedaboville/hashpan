@@ -72,7 +72,7 @@ bool CChainWalkContext::SetBIN(std::string sBIN)
 {
   if (!sBIN.empty())
   {
-    memcpy(m_BIN, sBIN.c_str(), sBIN.size());
+    memcpy(m_BIN, sBIN.c_str(), 6);
     return true;
   }
   else

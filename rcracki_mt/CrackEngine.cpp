@@ -586,9 +586,6 @@ void CCrackEngine::SearchTableChunkOld(RainbowChainO* pChain, int nRainbowChainL
 			if (rThread->FoundHash() && !foundHashInThread) {
 				printf("%-50s\r", "");
 
-				printf("plaintext has length %ld\n", rThread->GetPlain().size());
-				printf("found at index %d\n", rThread->GetIndexCount());
-				printf("binary is %s\n", rThread->GetBinary().c_str());
 				printf("plaintext of %s is %s\n", rThread->GetHash().c_str(), rThread->GetPlain().c_str());
 				if (writeOutput)
 				{
