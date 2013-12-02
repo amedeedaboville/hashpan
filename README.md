@@ -10,39 +10,48 @@ crack the hashes with
 Clover HashPAN Challenge
 ========================
 Problem: Crack a list of SHA1-encrypted credit card numbers.
-#Come up an algorithmically efficient implementation that minimizes work assuming a single core. Bonus points for efficiently using any/all cores you have at your disposal."
+
+
+#####Come up an algorithmically efficient implementation that minimizes work assuming a single core. Bonus points for efficiently using any/all cores you have at your disposal."
 
 Credit Card numbers are usually 16 digits long and consist of
-  a 6 digit Bank Id Number
-  a 9 digit Account number
-  a 1 digit Checksum
+* a 6 digit Bank Id Number
+* a 9 digit Account number
+* a 1 digit Checksum
 
 It's not unreasonable to assume that the hashes's BINS only come from the the given PANs, which makes the keyspace 73 billion keys.
 
 Rainbow Tables
 -------------
 The gist is that they allow you to pick a point between Pure Brute Force and Pure Precomputation of each hash.
-Pure Precomputation: Calculate every of 73E9 hashes and store them. Cracking is just a lookup. Takes 1.8 Tb of space for this contest, (20 bytes hash, 5 bytes PAN * 73E9), which kinda sucks.
+######Pure Precomputation
+Calculate every of 73 billion hashes and store them. Cracking is just a lookup. Takes 1.8 Tb of space for this contest, (20 bytes hash, 5 bytes PAN * 73E9), which kinda sucks.
 
-Pure Brute Force: What everyone else here is doing. Run HashCat on a supercomputing multi-GPU machine, get bajjillions of hashes per second and steamroll the hashes. Takes no space, suckas.
-My computer does about 2.3MH/s. So in extremely, extremely crude terms this would take a bit under 9 hours.  Obviously, there are cache lookups and branch misdirects and architectures, 
+######Pure Brute Force
+What everyone else here is doing. Run HashCat on a supercomputing multi-GPU machine, get bajjillions of hashes per second and steamroll the hashes. Takes no space, suckas.
+
+My computer does about 2.3MH/s. So in extremely, extremely crude terms this would take a bit under 9 hours.  Obviously, there are cache lookups and branch misdirects and architectures,
 but realistically this would take under a day. Also, this is really good because it also scales horizontally: You can split up the keyspace to 10 computers and have it solved 10x as fast.
 
 The scale is tipped toward pure brute force, but it's by no means definitive.
+
 Rainbow Tables are well suited for this example because there is a limited keyspace, and they definitely "minimize work for a single core".
 Also, I'm sure they could scale well to other hashes like sha256 or sha512, where brute force is much slower.
+
 My computer has an SSD in it, making lookups pretty fast, too.
 The first run of my untuned single-threaded program took 2 hours to crack 98%.
 
 Technical Info
 -----
 Basically rainbow tables allow you to precompute all of the hashes, and only store a small fraction of the computation.
+
 In more words, they chain the computations up and only store the first and last piece of the chain. Then for a given hash they check if it's in the chain.
 
 I've modified the original GPL implementation called rainbowcrack. It takes a BIN number and generates table for all valid PANS with that BIN.
+
 After, I changed an extension to rcrack, called rcracki\_mt to also work with BINs. It's multithreaded, and has CUDA extensions (which I haven't touched, so there's still a lot of potential for speedup.)
-In my second rewrite, I changed the index size from 64bit to 32, thereby cutting the size of the tables in half. 
-The actual parameters to the tables can be tweaked, but for this I used 5 tables with 4 million chains of length 250. I originally used chain lengths of 500, but since the size of the tables in 
-half I brought it down to 250 chain links and doubled the number of chains. Cracking time is O(n^2) with chain length, so that should afford a 4x speedup.
+
+In my second rewrite, I changed the index size from 64bit to 32, thereby cutting the size of the tables in half. The actual parameters to the tables can be tweaked, but for this I used 5 tables with 4 million chains of length 250. By halfing the table size I was able to also half the chain length. 
+Cracking time is O(n^2) with chain length, which affords a 4x speedup.
 
 The tables take ~11Gb of space.
