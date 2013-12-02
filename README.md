@@ -34,14 +34,9 @@ The gist is that they allow you to pick a point between Pure Brute Force and Pur
 Calculate every of 73 billion hashes and store them. Cracking is just a lookup. Takes 1.8 Tb of space for this contest, (20 bytes hash, 5 bytes PAN * 73E9), which kinda sucks.
 
 ######Pure Brute Force
-What everyone else here is doing. Run HashCat on a supercomputing multi-GPU machine, get bajjillions of hashes per second and steamroll the hashes. Takes no space, suckas.
+What everyone else here is doing. Run HashCat on a supercomputing multi-GPU machine, get bajjillions of hashes per second and steamroll the hashes. 
 
-My computer does about 2.3MH/s. So in extremely, extremely crude terms this would take a bit under 9 hours.  Obviously, there are cache lookups and branch misdirects and architectures,
-but realistically this would take under a day. Also, this is really good because it also scales horizontally: You can split up the keyspace to 10 computers and have it solved 10x as fast.
-
-The scale is tipped toward pure brute force, but it's by no means definitive.
-
-Rainbow Tables are well suited for this example because there is a limited keyspace, and they definitely "minimize work for a single core".
+Rainbow Tables balance are well suited for this example because there is a limited keyspace, and they definitely "minimize work for a single core".
 Also, I'm sure they could scale well to other hashes like sha256 or sha512, where brute force is much slower.
 
 My computer has an SSD in it, making lookups pretty fast, too.
