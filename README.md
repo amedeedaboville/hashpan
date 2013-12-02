@@ -36,7 +36,8 @@ Calculate every of 73 billion hashes and store them. Cracking is just a lookup. 
 ######Pure Brute Force
 What everyone else here is doing. Run HashCat on a supercomputing multi-GPU machine, get bajjillions of hashes per second and steamroll the hashes. 
 
-Rainbow Tables balance are well suited for this example because there is a limited keyspace, and they definitely "minimize work for a single core".
+
+Rainbow Tables are well suited for this example because there is a limited keyspace, and they definitely "minimize work for a single core".
 Also, I'm sure they could scale well to other hashes like sha256 or sha512, where brute force is much slower.
 
 My computer has an SSD in it, making lookups pretty fast, too.
