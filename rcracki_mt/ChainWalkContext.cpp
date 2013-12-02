@@ -295,10 +295,9 @@ void CChainWalkContext::IndexToPlain()
 {
 
 	uint32_t plainLen = 16; //m_nPlainSpace up to X, in our case is 15 0's, then 1 1billion. Not that useful
-	uint64_t index = m_nIndex;// - m_nPlainSpaceUpToX[a]; // plainLen - 1 == a
+	uint32_t index = m_nIndex;// //eh, assume index< 1e9 because we use CCs.
   int a;
 
-  //amedee: Combining the loops because I'm 64bits osx
   for (a = plainLen - 2; a >= 6; a-- ) //start from -2 because len-1 will store the luhn
   {
 		m_Plain[a] = m_PlainCharset[index % m_nPlainCharsetLen];

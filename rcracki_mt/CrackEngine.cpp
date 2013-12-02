@@ -538,6 +538,7 @@ void CCrackEngine::SearchTableChunkOld(RainbowChainO* pChain, int nRainbowChainL
 				for (i = nMatchingIndexEFrom; i <= nMatchingIndexETo; i++)
 				{
 					rcrackiThread* rThread = threadPool[thread_ID];
+      //printf("plaintext of thread %d and hash %s is %s\n", thread_ID, rThread->GetHash().c_str(), rThread->GetPlain().c_str());
 					rThread->AddAlarmCheckO(pChain + i, nPos);
 					if (thread_ID < (unsigned long)maxThreads - 1 ) {
 						thread_ID++;
@@ -585,6 +586,9 @@ void CCrackEngine::SearchTableChunkOld(RainbowChainO* pChain, int nRainbowChainL
 			if (rThread->FoundHash() && !foundHashInThread) {
 				printf("%-50s\r", "");
 
+				printf("plaintext has length %ld\n", rThread->GetPlain().size());
+				printf("found at index %d\n", rThread->GetIndexCount());
+				printf("binary is %s\n", rThread->GetBinary().c_str());
 				printf("plaintext of %s is %s\n", rThread->GetHash().c_str(), rThread->GetPlain().c_str());
 				if (writeOutput)
 				{
@@ -911,6 +915,7 @@ void CCrackEngine::SearchTableChunk(RainbowChain* pChain, int nRainbowChainLen, 
 			if (rThread->FoundHash() && !foundHashInThread) {
 				printf("%-50s\r", "");
 
+				printf("plaintext has length %ld\n", rThread->GetPlain().size());
 				printf("plaintext of %s is %s\n", rThread->GetHash().c_str(), rThread->GetPlain().c_str());
 				if (writeOutput)
 				{
@@ -1099,13 +1104,15 @@ void CCrackEngine::SearchRainbowTable( std::string pathName, CHashSet& hs )
 					uint32_t i;
 					for( i = 0; i < nChains - 1; i++ )
 					{
-						if( pChain[i].nIndexE > pChain[i + 1].nIndexE )
+						if( pChain[i].nIndexE > pChain[i + 1].nIndexE ) {
+              std:: cout << "chain " << i << " index is " << pChain[i].nIndexE << " and chain " << i+1<< " is " << pChain[i+1].nIndexE << std::endl;
 							break;
+            }
 					}
 
 					if( i != nChains - 1 )
 					{
-						std::cout << "this file is not sorted" << std::endl;
+						std::cout << "this file is not sorted : " << i << " is not " << nChains -1 << std::endl;
 						break;
 					}
 
@@ -1392,7 +1399,7 @@ void CCrackEngine::SearchRainbowTable( std::string pathName, CHashSet& hs )
 					if( i != nChains - 1 )
 
 					{
-						std::cout << "this file is not sorted" << std::endl;
+						std::cout << "this file is not sorted (rti)" << std::endl;
 						break;
 					}
 

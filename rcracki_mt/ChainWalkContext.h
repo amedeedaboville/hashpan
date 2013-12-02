@@ -57,7 +57,7 @@ public:
 	// Context
 	uint64_t m_nIndex;
 	unsigned char m_Plain[MAX_PLAIN_LEN];
-	int m_nPlainLen;
+	int m_nPlainLen = 16;
 	unsigned char m_Hash[MAX_HASH_LEN];
 	static unsigned char m_Salt[MAX_SALT_LEN];
 	static int m_nSaltLen;
